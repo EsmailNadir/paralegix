@@ -68,7 +68,7 @@
     "pino-http": "^11.0.0",
     "pizzip": "^3.2.0",
     "posthog-node": "^5.52.5",
-    "puppeteer-core": "^24.43.1",
+    "puppeteer-core": "^25.13.0",
     "resend": "^6.9.2",
     "sanitize-html": "^2.17.5",
     "stripe": "^22.2.0",
