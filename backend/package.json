@@ -49,7 +49,7 @@
     "cors": "^2.8.5",
     "dayjs": "^1.11.13",
     "docxtemplater": "^3.68.3",
-    "dotenv": "^17.4.2",
+    "dotenv": "^18.0.7",
     "drizzle-orm": "^0.45.2",
     "express": "^5.1.0",
     "express-rate-limit": "^8.5.2",
