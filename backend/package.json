@@ -84,7 +84,7 @@
     "eslint": "^9.39.5",
     "jest": "^30.3.0",
     "jpeg-js": "0.4.4",
-    "pdfjs-dist": "^4.8.69",
+    "pdfjs-dist": "^6.4.299",
     "puppeteer": "^24.43.1",
     "supertest": "^7.2.2",
     "ts-jest": "^29.4.12",
