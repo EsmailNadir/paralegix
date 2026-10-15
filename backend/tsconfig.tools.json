@@ -1,0 +1,27 @@
+{
+  // Type-check-only config for the operator tooling under db/ and scripts/.
+  //
+  // These files are NOT build output. The Dockerfile copies dist/ and nothing
+  // else, and the base config compiles src/ alone -- so the container never
+  // carries a seed script. They are run straight from a checkout with `tsx`,
+  // the same runner `npm run dev` already uses.
+  //
+  // Folding them into the base config instead would force `rootDir` up from
+  // "src" to ".", which silently relocates every compiled file to dist/src/...
+  // and breaks `CMD ["node", "dist/server.js"]`.
+  //
+  // This config exists so they are still checked. TypeScript that nothing ever
+  // type-checks is worse than JavaScript: it looks converted and isn't.
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "rootDir": ".",
+    "noEmit": true
+  },
+  // Restated for the same reason tsconfig.test.json restates it: an inherited
+  // `exclude` beats this file's `include`, so without this line the base
+  // config's excludes would apply and quietly narrow what gets checked.
+  "exclude": ["node_modules", "dist", "dist-test"],
+  // src/ is listed because the tools import from it. Checking them against a
+  // different view of src/ than the build uses is how a config starts lying.
+  "include": ["db/**/*.ts", "scripts/**/*.ts", "src/**/*"]
+}

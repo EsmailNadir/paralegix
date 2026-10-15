@@ -1,0 +1,63 @@
+
+# Dependencies
+node_modules/
+
+# Logs
+*.log
+
+# Environment files: every .env variant is ignored; only the templates are tracked.
+.env
+.env.*
+!.env.example
+!.env.*.example
+
+# Credentials and keys
+serviceAccountKey*.json
+*.json.key
+*.pem
+*.key
+*.p12
+*.pfx
+*.keystore
+
+# Local HTTP request scratch files (they tend to carry bearer tokens)
+*.rest
+*.http
+
+# Database dumps
+*.dump
+*.sql.gz
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# VitePress
+docs/.vitepress/dist
+docs/.vitepress/cache
+docs/node_modules
+
+# Stray document files (should not be committed)
+/*.pdf
+
+# Playwright MCP session dumps (regenerated on every test run)
+.playwright-mcp/
+
+# Seed fixture documents (real PDFs, kept out of git)
+backend/db/seed/fixtures/
+
+# Throwaway git worktrees (each is a full checkout; never a repo artifact)
+.claude/worktrees/
+
+backend/catalog-parity.diff

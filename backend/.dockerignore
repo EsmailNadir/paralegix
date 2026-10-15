@@ -1,0 +1,17 @@
+node_modules
+npm-debug.log*
+.env
+.env.*
+!.env.example
+serviceAccountKey.json
+*.json.key
+paralegix-signing.p12
+test-requests
+.git
+.gitignore
+# Neither Dockerfile copies these. Excluding them keeps them out of the build
+# context that every image build uploads.
+coverage
+dist
+dist-test
+tests

@@ -1,0 +1,285 @@
+steps:
+  # Step 1: Install dependencies, including devDependencies, which the
+  # typecheck, lint and build steps below need. `--include=dev` replaces the
+  # deprecated `--production=false`, and it still installs them if NODE_ENV is
+  # ever set to production for this build. The `puppeteer` dev dependency would
+  # download a Chrome here that no step runs, so that download is skipped.
+  - name: 'node:22-slim'
+    dir: 'backend'
+    entrypoint: 'npm'
+    env: ['PUPPETEER_SKIP_DOWNLOAD=true']
+    args: ['ci', '--include=dev']
+
+  # Step 2: Type-check and lint
+  #
+  # There is no `node --check` pass any more: the backend is 100% TypeScript, so
+  # the old `find src -name "*.js" -exec node --check` matched nothing and passed
+  # vacuously. `npm run typecheck` covers both programs -- src/ (the build) and
+  # db/ + scripts/ (the operator tooling, which tsc never emits).
+  - name: 'node:22-slim'
+    dir: 'backend'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        # `set -e` is what makes this step a gate. Without it bash reports the
+        # status of the LAST command only, so a failing typecheck, lint or guard
+        # printed its error and the build carried on to deploy. Seen on the
+        # staging builds of 2026-09-11, 09-12 and 09-14, which all succeeded
+        # while `check-files-tree` was failing.
+        set -euo pipefail
+        echo "Type-checking..."
+        npm run typecheck && echo "Types OK"
+        echo "Linting..."
+        npm run lint && echo "Lint OK"
+        npx tsx db/check-js-count.ts
+        npx tsx db/check-raw-query-count.ts
+        npx tsx db/check-files-tree.ts
+        npx tsx db/build-schema.ts --check
+
+  # Step 3: Compile TypeScript.
+  #
+  # Required, not redundant. `npm run typecheck` above is `tsc --noEmit`, so it
+  # deliberately writes nothing, and dist/ is gitignored and therefore absent
+  # from the checkout. Without this step the boot test below would spawn a path
+  # that does not exist. The Dockerfile compiles again from scratch in its own
+  # build stage; this copy exists so a compile or boot failure surfaces here
+  # rather than two steps later inside the image build.
+  - name: 'node:22-slim'
+    dir: 'backend'
+    entrypoint: 'npm'
+    args: ['run', 'build']
+
+  # Step 4: Boot test — start the BUILT server, hit health endpoint, shut down
+  - name: 'node:22-slim'
+    dir: 'backend'
+    entrypoint: 'node'
+    args:
+      - '-e'
+      - |
+        const http = require('http');
+        const { spawn } = require('child_process');
+
+        const child = spawn('node', ['dist/server.js'], {
+          cwd: process.cwd(),
+          // SKIP_STARTUP_JOBS was removed: nothing in src/ ever read it, so it
+          // gave false comfort that the boot test skipped background work. The
+          // sweeps it was meant to suppress now run on /api/cron/housekeeping.
+          env: { ...process.env, PORT: '8080' },
+          stdio: 'inherit',
+        });
+
+        let finished = false;
+
+        function finish(code) {
+          if (finished) return;
+          finished = true;
+          if (!child.killed) child.kill('SIGTERM');
+          setTimeout(() => process.exit(code), 250);
+        }
+
+        child.on('exit', (code) => {
+          if (!finished) {
+            console.error('Server exited before health check completed with code', code);
+            finish(1);
+          }
+        });
+
+        setTimeout(() => {
+          http.get('http://127.0.0.1:8080/api/health', (res) => {
+            res.resume();
+            finish(res.statusCode === 200 ? 0 : 1);
+          }).on('error', () => {
+            finish(1);
+          });
+        }, 5000);
+
+  # Step 5: Build API and private document-worker images from the same commit.
+  - name: 'gcr.io/cloud-builders/docker'
+    dir: 'backend'
+    args:
+      - 'build'
+      - '-t'
+      - '${_REGION}-docker.pkg.dev/$PROJECT_ID/paralegix-backend/api:$COMMIT_SHA'
+      - '-t'
+      - '${_REGION}-docker.pkg.dev/$PROJECT_ID/paralegix-backend/api:latest'
+      - '.'
+
+  - name: 'gcr.io/cloud-builders/docker'
+    dir: 'backend'
+    args:
+      - 'build'
+      - '-f'
+      - 'Dockerfile.document-worker'
+      - '-t'
+      - '${_REGION}-docker.pkg.dev/$PROJECT_ID/paralegix-backend/document-worker:$COMMIT_SHA'
+      - '-t'
+      - '${_REGION}-docker.pkg.dev/$PROJECT_ID/paralegix-backend/document-worker:latest'
+      - '.'
+
+  # Step 6: Push commit-tagged image
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - '${_REGION}-docker.pkg.dev/$PROJECT_ID/paralegix-backend/api:$COMMIT_SHA'
+
+  # Step 7: Push latest image
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - '${_REGION}-docker.pkg.dev/$PROJECT_ID/paralegix-backend/api:latest'
+
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - '${_REGION}-docker.pkg.dev/$PROJECT_ID/paralegix-backend/document-worker:$COMMIT_SHA'
+
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - '${_REGION}-docker.pkg.dev/$PROJECT_ID/paralegix-backend/document-worker:latest'
+
+  # Step 8: Deploy to Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    dir: 'backend'
+    entrypoint: 'gcloud'
+    args:
+      - 'run'
+      - 'deploy'
+      - '${_SERVICE_NAME}'
+      - '--image=${_REGION}-docker.pkg.dev/$PROJECT_ID/paralegix-backend/api:$COMMIT_SHA'
+      - '--region=${_REGION}'
+      - '--platform=managed'
+      # Runtime topology, pinned here rather than left in the console. Until now
+      # none of these were passed, so every value was set by hand once and
+      # silently preserved across deploys -- which made the topology the whole
+      # connection budget reasons about unreproducible and unreviewable. The
+      # values below are the ones read off the live services, so pinning them is
+      # a no-op today and a diff from here on.
+      - '--max-instances=${_MAX_INSTANCES}'
+      # Keeps connectionBudget.ts's derivation in sync with the real deploy flag
+      # above -- without this, MAX_INSTANCES is unset in the running container and
+      # the pool silently falls back to its pre-budget default instead of the
+      # value this flag actually implies. Deliberately --update-env-vars, not
+      # --set-env-vars: the latter REPLACES every env var on the service, and none
+      # of the application secrets (DATABASE_URL, Firebase, etc.) are set in this
+      # file, so --set-env-vars here would wipe them on the next deploy.
+      #
+      # The render and conversion limits ride along for the same reason: they are
+      # sized against this topology (see the substitutions below), so they are
+      # pinned beside it rather than set by hand per service. Their defaults equal
+      # the code's own, which tests/config/deployBudget.test.ts checks.
+      - '--update-env-vars=MAX_INSTANCES=${_MAX_INSTANCES},DOCUMENT_CONVERTER=${_DOCUMENT_CONVERTER},DOC_CONVERT_CONCURRENCY=${_DOC_CONVERT_CONCURRENCY},TEMPLATE_FILL_CONCURRENCY=${_TEMPLATE_FILL_CONCURRENCY},TEMPLATE_EXPORT_CONCURRENCY=${_TEMPLATE_EXPORT_CONCURRENCY},TEMPLATE_RENDERS_PER_PERSON=${_TEMPLATE_RENDERS_PER_PERSON},TEMPLATE_FILL_QUEUE_TIMEOUT_MS=${_TEMPLATE_FILL_QUEUE_TIMEOUT_MS},TEMPLATE_EXPORT_QUEUE_TIMEOUT_MS=${_TEMPLATE_EXPORT_QUEUE_TIMEOUT_MS}'
+      # Scale to zero stays. min-instances > 0 is the one Cloud Run setting that
+      # adds a cost floor rather than tracking usage, and this plan is explicitly
+      # cost-neutral.
+      - '--min-instances=0'
+      - '--concurrency=80'
+      - '--cpu=1'
+      - '--memory=512Mi'
+      # The Cloud Run maximum. Nothing ordinary runs this long; the two things
+      # that can are a folder archive (streamed through this service, stored
+      # rather than deflated, so it is bound by the client's download speed)
+      # and the cron routes, which carry their own 240s budget. A request that
+      # is genuinely stuck is bounded by the instance draining, not by this.
+      - '--timeout=3600'
+      # Request-based CPU allocation, stated explicitly because two separate
+      # arguments depend on it: the cost-neutrality of raising max-instances, and
+      # the finding that setInterval-based housekeeping is starved on Cloud Run
+      # (background timers get almost no CPU between requests). Flipping this to
+      # --no-cpu-throttling changes both conclusions.
+      - '--cpu-throttling'
+
+  # The worker is IAM-private: do not pass --allow-unauthenticated. It has no
+  # database or application secrets; the API hands it short-lived GCS commands.
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: 'gcloud'
+    args:
+      - 'run'
+      - 'deploy'
+      - '${_DOCUMENT_WORKER_SERVICE_NAME}'
+      - '--image=${_REGION}-docker.pkg.dev/$PROJECT_ID/paralegix-backend/document-worker:$COMMIT_SHA'
+      - '--region=${_REGION}'
+      - '--platform=managed'
+      - '--service-account=${_DOCUMENT_WORKER_SERVICE_ACCOUNT}'
+      - '--no-allow-unauthenticated'
+      - '--min-instances=0'
+      - '--max-instances=${_DOCUMENT_WORKER_MAX_INSTANCES}'
+      - '--concurrency=1'
+      - '--cpu=1'
+      - '--memory=1Gi'
+      - '--timeout=120'
+      - '--cpu-throttling'
+
+# Per-environment overrides. The production trigger (main) uses these defaults; the
+# staging trigger (staging branch) overrides _SERVICE_NAME=paralegix-api-staging.
+substitutions:
+  _SERVICE_NAME: paralegix-api
+  # Ashburn, Northern Virginia. This SHOULD be us-east5 (Columbus), where the
+  # GCS buckets and Supabase already live, and it was briefly set there. That
+  # deploy failed and the value is back, deliberately, until one prerequisite
+  # is done.
+  #
+  # Changing this region does not move a service. A Cloud Run service cannot
+  # change region, so the deploy CREATES a new service, and a new service
+  # starts with only the environment this file passes it. That is one variable,
+  # MAX_INSTANCES. The other 34 (DATABASE_URL, the Firebase key, Supabase,
+  # Stripe, the OAuth clients, CRON_SECRET) were set on the us-east4 services by
+  # hand and exist nowhere in this repo, so the Columbus service booted with no
+  # database URL and its own startup guard exited it.
+  #
+  # The prerequisite is therefore to make the service environment reproducible,
+  # by moving those values into Secret Manager and referencing them here with
+  # --set-secrets. Then this region flip becomes the small change it looks like.
+  # See docs/dev/ops/cloud-architecture.md.
+  #
+  # The Artifact Registry host is built from this value rather than written out,
+  # so the images and the services cannot drift into different regions again.
+  # us-east5 repo already exists and stays; it costs nothing while unused.
+  #
+  # Cloud Scheduler has NO us-east5 location and would stay in us-east4 either
+  # way. That costs nothing: every job is an empty POST to
+  # https://api.paralegix.com, so it carries no payload and never notices.
+  _REGION: us-east4
+  # One instance. The app is multi-instance-ready (see docs/dev/ops/deployment.md),
+  # The Supabase session pooler's pool_size was raised to 20 on 2026-09-16
+  # (POOLER_CEILING_SAFE=17), which is enough for two instances of 8 connections
+  # each. Raise the pool size in Supabase and POOLER_CEILING_SAFE before going
+  # past that. See connectionBudget.ts.
+  _MAX_INSTANCES: '1'
+  _DOCUMENT_WORKER_SERVICE_NAME: paralegix-document-worker
+  _DOCUMENT_WORKER_SERVICE_ACCOUNT: document-worker@your-gcp-project.iam.gserviceaccount.com
+  _DOCUMENT_WORKER_MAX_INSTANCES: '2'
+  _DOCUMENT_CONVERTER: 'local'
+  # Per-API-instance limits on document work, passed to the API as env vars of
+  # the same name. Every default here is the code default, so deploying this
+  # file changes nothing; a trigger overrides one to change capacity.
+  #
+  # The budget that binds them (checked by tests/config/deployBudget.test.ts):
+  #
+  #   _MAX_INSTANCES * (_DOC_CONVERT_CONCURRENCY + _TEMPLATE_EXPORT_CONCURRENCY)
+  #     <= _DOCUMENT_WORKER_MAX_INSTANCES
+  #
+  # The worker runs one job per instance, so asking for more at once makes Cloud
+  # Run refuse the extra request instead of queueing it.
+  #
+  # Example capacity step: _MAX_INSTANCES '2', _DOC_CONVERT_CONCURRENCY '2',
+  # _TEMPLATE_EXPORT_CONCURRENCY '1', so 2 * (2 + 1) = 6 and
+  # _DOCUMENT_WORKER_MAX_INSTANCES must be at least '6'. Raise
+  # _DOC_CONVERT_CONCURRENCY above 1 only with _DOCUMENT_CONVERTER 'worker':
+  # with 'local' each conversion is a soffice process inside this 512Mi API.
+  #
+  # Past 2 API instances the database is the next limit, not these. Each
+  # instance's pool is PG_POOL_MAX = floor(POOLER_CEILING_SAFE / MAX_INSTANCES)
+  # (src/shared/database/connectionBudget.ts), and POOLER_CEILING_SAFE is 17,
+  # sized to the Supabase session pooler's pool_size of 20. Two instances get 8
+  # connections each; three would get 5. Raise the pooler's pool_size in
+  # Supabase and POOLER_CEILING_SAFE with it before raising _MAX_INSTANCES.
+  _DOC_CONVERT_CONCURRENCY: '1'
+  _TEMPLATE_FILL_CONCURRENCY: '2'
+  _TEMPLATE_EXPORT_CONCURRENCY: '1'
+  _TEMPLATE_RENDERS_PER_PERSON: '2'
+  _TEMPLATE_FILL_QUEUE_TIMEOUT_MS: '30000'
+  _TEMPLATE_EXPORT_QUEUE_TIMEOUT_MS: '45000'
+options:
+  logging: CLOUD_LOGGING_ONLY

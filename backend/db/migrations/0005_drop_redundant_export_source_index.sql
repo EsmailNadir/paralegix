@@ -1,0 +1,12 @@
+-- migration-mode: expand
+--
+-- Drop an index the primary key already covers.
+--
+-- `file_export_job_sources` is keyed on (law_firm_id, job_id, file_id), so an
+-- index on (law_firm_id, job_id) is a strict prefix of the key's own index. The
+-- planner never picks it, and it is one more structure every insert into the
+-- table has to maintain.
+--
+-- The file arm keeps its index: it is a foreign key that leads no other index,
+-- so without one a cascade delete of a document scans the whole table.
+drop index if exists file_export_job_sources_job_idx;

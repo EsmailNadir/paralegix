@@ -1,0 +1,38 @@
+jest.unmock('@/services/client-portal.service');
+jest.unmock('@/services/requestDeduplicator');
+import React from 'react';
+import { screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import ClientNotificationBell from '@/components/notificationComp/ClientNotificationBell';
+import { renderWithProviders } from '../../support/renderWithProviders';
+import { setupApiMock } from '../../support/apiMock';
+const api = setupApiMock();
+it('discloses the actual unread feed, closes it on Escape, and hides the exiting keyboard controls', async () => {
+  api.get('/notifications', { notifications: [{ id: 'notification-a', type: 'document_request', title: 'Upload identification', body: 'Requested by Firm A', read: false, entityType: 'matter', matterId: 'matter-a', actionUrl: null, createdAt: '2026-10-04T12:00:00Z' }], unreadCount: 1, nextBefore: null, nextBeforeId: null });
+  const user = userEvent.setup();
+  renderWithProviders(<ClientNotificationBell lawFirmId="firm-a" />);
+  const bell = screen.getByRole('button', { name: 'Notifications' });
+  await waitFor(() => expect(bell).toHaveAccessibleDescription('1 unread notification'));
+  await user.tab();
+  await user.keyboard('{Enter}');
+  expect(bell).toHaveAttribute('aria-expanded', 'true');
+  const panel = document.getElementById(bell.getAttribute('aria-controls')!);
+  expect(panel).toContainElement(screen.getByRole('button', { name: /Upload identification.*Unread/ }));
+  await user.tab();
+  expect(screen.getByRole('button', { name: 'Mark all read' })).toHaveFocus();
+  await user.keyboard('{Escape}');
+  expect(bell).toHaveFocus();
+  expect(bell).toHaveAttribute('aria-expanded', 'false');
+  expect(panel).toHaveAttribute('inert');
+  expect(panel).toHaveAttribute('aria-hidden', 'true');
+  expect(screen.queryByRole('button', { name: 'Mark all read' })).not.toBeInTheDocument();
+  expect(api.callsTo('/notifications')[0].url).toContain('firm-a');
+});
+it('announces a refused feed instead of claiming there are no notifications', async () => {
+  api.get('/notifications', { status: 403, body: { error: 'Notifications unavailable' } });
+  renderWithProviders(<ClientNotificationBell lawFirmId="firm-a" />);
+  await userEvent.click(screen.getByRole('button', { name: 'Notifications' }));
+  expect(await screen.findByRole('alert')).toHaveTextContent('Notifications unavailable');
+  expect(screen.queryByText("You're all caught up.")).not.toBeInTheDocument();
+  expect(api.callsTo('/notifications')).toHaveLength(1);
+});

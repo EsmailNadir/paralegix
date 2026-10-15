@@ -1,0 +1,47 @@
+{
+  "name": "@paralegix/document-layout",
+  "version": "1.0.0",
+  "private": true,
+  "main": "dist/textFit.js",
+  "types": "dist/textFit.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/textFit.d.ts",
+      "default": "./dist/textFit.js"
+    },
+    "./textFit": {
+      "types": "./dist/textFit.d.ts",
+      "default": "./dist/textFit.js"
+    },
+    "./textFitRich": {
+      "types": "./dist/textFitRich.d.ts",
+      "default": "./dist/textFitRich.js"
+    },
+    "./templateReflow": {
+      "types": "./dist/templateReflow.d.ts",
+      "default": "./dist/templateReflow.js"
+    }
+  },
+  "scripts": {
+    "prepare": "node build.mjs"
+  },
+  "files": [
+    "dist",
+    "src",
+    "tsconfig.json",
+    "build.mjs"
+  ],
+  "typesVersions": {
+    "*": {
+      "textFit": [
+        "dist/textFit.d.ts"
+      ],
+      "textFitRich": [
+        "dist/textFitRich.d.ts"
+      ],
+      "templateReflow": [
+        "dist/templateReflow.d.ts"
+      ]
+    }
+  }
+}

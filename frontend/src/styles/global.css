@@ -1,0 +1,1129 @@
+@import "tailwindcss";
+
+/* Reserve space for scrollbar to prevent layout shift when it appears */
+html {
+  scrollbar-gutter: stable;
+}
+
+/* Tailwind's `space-y-*` puts the gap on every child except the last one
+   (`> :not(:last-child) { margin-block-end: … }`). Modal and overlay roots are
+   position:fixed, so they take up no room in the flow, but they still count as
+   children: mounting one at the end of a `space-y-*` container makes the last
+   real block stop being `:last-child`, which hands it a bottom margin out of
+   nowhere and grows the container (a page or card visibly gets taller at the
+   bottom while a modal is open). Positioned-out-of-flow children take no room,
+   so they shouldn't create spacing either: drop the gap on any child whose
+   remaining siblings are all out of flow. */
+[class*="space-y-"] > :not(:has(~ :not(.fixed, .absolute))) {
+  margin-block-end: 0;
+}
+
+/* iOS Safari zooms the whole page in whenever a focused form control has a
+   font-size below 16px. Most of our inputs use text-sm (14px), so tapping any
+   field triggers that zoom every time, which makes the site awkward on phones.
+   Forcing a 16px minimum on touch-primary devices stops the zoom-on-focus. We
+   deliberately do NOT set maximum-scale on the viewport, so pinch-to-zoom stays
+   available for accessibility. Excludes controls that never trigger the zoom. */
+@media (pointer: coarse) {
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not([type="file"]),
+  select,
+  textarea,
+  .ProseMirror {
+    font-size: 16px;
+  }
+}
+
+/* No number field paints a spinner.
+
+   The browser paints it only while the field has focus or the pointer is over
+   it, so a spinner does not sit in the layout: it appears mid-interaction and
+   pushes the field's own content aside. In a fused cluster, such as the flat
+   fee row, that reflows the whole row under the cursor.
+
+   It is also wrong for the money this app is mostly made of. Stepping a fee by
+   one cent at a time is not a thing anyone does, and 27 amount fields had a
+   control offering exactly that.
+
+   The value still steps from the keyboard and the scroll wheel. Only the
+   painted buttons go, so nothing here removes a way to enter a number.
+
+   This replaced the same three Tailwind classes hand-copied to 22 inputs, which
+   is why most number fields already looked like this and the rest did not.
+   `tests/styles/numberSpinner.test.ts` fails if a call site spells them again. */
+input[type="number"] {
+  appearance: textfield;
+}
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  appearance: none;
+  margin: 0;
+}
+
+/* Ensure all interactive elements show pointer cursor */
+button:not(:disabled),
+[role="button"]:not(:disabled),
+select:not(:disabled),
+summary {
+  cursor: pointer;
+}
+
+/* One focus indicator, declared once, for the whole app.
+
+   Clicking a control shows nothing: `:focus-visible` does not match a mouse
+   click on a button, so the pointer path stays as quiet as it was before.
+   Reaching a control by keyboard draws a thin outline in the accent.
+
+   It is an outline rather than Tailwind's `ring-*` utilities even though 219
+   of those are declared across 97 files. Letting both draw puts a ring AND an
+   outline around one control, and on the filled `primary` button the ring's
+   2px offset reads as a second edge floating off the first. So the ring
+   box-shadow stays suppressed and the outline is the only source. An outline
+   also costs nothing to cover the 1,065 hand-rolled buttons that never
+   declared a ring class, which a per-component approach would have missed.
+
+   2px at a 1px offset is deliberate: enough to find, small enough not to read
+   as a border of its own. `.skip-link` keeps its own treatment, since it
+   relies on focus to become visible at all.
+
+   `!important` is load-bearing. Buttons and inputs carry Tailwind's
+   `focus:outline-none`, which resolves to the same specificity as this rule,
+   so without it the winner is decided by which one the stylesheet happens to
+   emit last. That is how the indicator was lost the first time. */
+*:focus:not(:focus-visible):not(.skip-link) {
+  outline: none;
+  box-shadow: none !important;
+}
+
+*:focus-visible:not(.skip-link) {
+  outline: 2px solid var(--focus-ring) !important;
+  outline-offset: 1px !important;
+  box-shadow: none !important;
+}
+
+/* Script-moved focus on a non-interactive target: a page title focused on load
+   or an error message focused after a failed save, so a screen reader announces
+   it. The browser treats that focus as visible, but nothing there can be
+   operated, so the outline only reads as a stray box around a heading. A
+   control keeps its outline even at tabindex -1. This sits after the global
+   rule so it wins the equal `!important`. */
+[tabindex="-1"]:not(:is(a, button, input, select, textarea, [role="option"], [role="menuitem"], [role="tab"])):focus-visible {
+  outline: none !important;
+}
+
+/* A fused cluster is several controls behind one shared border, split by
+   `divide-x` rather than by a gap, so it reads as a single field: the flat fee
+   row (description, amount, date), the hours/minutes stepper, the tag box. The
+   cluster owns the indicator and carries `focus-within:ring-2
+   focus-within:ring-focus-ring`. Without this rule the focused cell ALSO takes
+   the outline above, and the result is the doubled edge that rule exists to
+   prevent: a box around one cell, drawn inside a ring around the row.
+
+   The cells are the exception to "the indicator goes on the focused element".
+   A cell has no border of its own, so a ring on the cluster still points at
+   what the user is typing in, and it keeps the cluster reading as one field.
+
+   Only the cells lose their outline. A field is a cell by being a field; a
+   non-field cell opts in with `.fused-field-cell` (the `bare` DatePicker
+   trigger does). An action button inside a cluster, such as a stepper, is not
+   a cell and keeps its own outline, since a ring on the cluster would not say
+   which button is focused.
+
+   `:is()` is here for specificity, not for filtering. The rule above is
+   `!important` at the same specificity, so without the extra selector the
+   winner is whichever the stylesheet emits last. */
+.fused-field-group :is(input, select, textarea, .fused-field-cell):focus-visible {
+  outline: none !important;
+}
+
+/* `--outline` draws card edges, dividers and modal borders, which are
+   decoration and carry no meaning on their own. `--control-border` draws the
+   edge of a control that has nothing else to mark where it begins, which under
+   WCAG 1.4.11 has to clear 3:1 against what sits either side of it.
+   `--input-border` does the same for a field or a trigger. They hold the same
+   value today and are split by role, not by colour: a divider may lighten later
+   without dragging a button's edge with it.
+
+   None of the three changes on focus. The outline above is the whole
+   indicator. A control that also recoloured its border drew a second edge one
+   pixel inside the first, which is what put two rings around the search bar;
+   65 such classes were removed and `tests/styles/focusIndicator.test.ts` fails
+   if one comes back. */
+
+/* Skip-to-content link: visually hidden until focused, then pinned to the
+   top-left so keyboard users can jump past the sidebar/nav to the main region. */
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 100;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  background: var(--surface);
+  color: var(--on-surface);
+  border: 1px solid var(--outline);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.skip-link:focus {
+  left: 0.5rem;
+  top: 0.5rem;
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+/* Override Tailwind v4 dark mode to use class strategy */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Register semantic color tokens with Tailwind */
+@theme inline {
+  --color-page: var(--page);
+  --color-surface: var(--surface);
+  --color-surface-alt: var(--surface-alt);
+  --color-surface-hover: var(--surface-hover);
+  --color-on-surface: var(--on-surface);
+  --color-on-surface-secondary: var(--on-surface-secondary);
+  --color-on-surface-muted: var(--on-surface-muted);
+  --color-outline: var(--outline);
+  --color-outline-subtle: var(--outline-subtle);
+  --color-input-bg: var(--input-bg);
+  --color-input-border: var(--input-border);
+  --color-control-border: var(--control-border);
+  --color-messages-area: var(--messages-area);
+  --color-message-bubble-received: var(--message-bubble-received);
+  --color-accent-solid: var(--accent-solid);
+  --color-accent-solid-hover: var(--accent-solid-hover);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent-emphasis: var(--accent-emphasis);
+  --color-accent-emphasis-hover: var(--accent-emphasis-hover);
+  --color-accent-selection: var(--accent-selection);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-border-soft: var(--accent-border-soft);
+  --color-accent-control-ring: var(--accent-control-ring);
+  --color-accent-row-selected: var(--accent-row-selected);
+  --color-accent-range: var(--accent-range);
+  --color-accent-picker: var(--accent-picker);
+  --color-accent-catalog: var(--accent-catalog);
+  --color-accent-indicator: var(--accent-indicator);
+  --color-accent-active-hover: var(--accent-active-hover);
+  --color-focus-ring: var(--focus-ring);
+}
+
+/* ============================================================
+   Marketing site palette (paper + brass editorial).
+   Fixed-value tokens. NOT theme-aware, so the public marketing
+   pages render identically regardless of the visitor's saved
+   light/dark preference. Use via mkt- utilities, e.g.
+   `bg-mkt-paper text-mkt-ink`, `shadow-mkt-lg`, `font-mkt-serif`.
+   ============================================================ */
+@theme {
+  --color-mkt-ink: #16222f;
+  --color-mkt-ink-2: #3a4856;
+  --color-mkt-ink-3: #64727f;
+  --color-mkt-paper: #f7f4ed;
+  --color-mkt-paper-2: #efe9dd;
+  --color-mkt-card: #ffffff;
+  --color-mkt-line: rgb(22 34 47 / 0.10);
+  --color-mkt-line-2: rgb(22 34 47 / 0.06);
+  --color-mkt-accent: oklch(0.60 0.085 72);
+  --color-mkt-accent-deep: oklch(0.50 0.085 70);
+  --color-mkt-accent-soft: oklch(0.93 0.03 78);
+  --color-mkt-ok: oklch(0.60 0.10 155);
+  --color-mkt-warn: oklch(0.66 0.13 55);
+
+  --shadow-mkt-lg: 0 40px 80px -32px rgb(22 34 47 / 0.40);
+  --shadow-mkt-md: 0 18px 40px -20px rgb(22 34 47 / 0.28);
+  --shadow-mkt-sm: 0 6px 18px -10px rgb(22 34 47 / 0.25);
+
+  --font-mkt-serif: var(--font-newsreader), Georgia, serif;
+  --font-mkt-sans: var(--font-jakarta), system-ui, -apple-system, sans-serif;
+}
+
+/* Light theme (default) */
+:root {
+  --page: #E4E7EF;
+  --surface: #F8F9FC;
+  --surface-alt: #EEF1F7;
+  --surface-hover: #E3E8F2;
+  --on-surface: #0D1016;
+  --on-surface-secondary: #4E5667;
+  --on-surface-muted: #5C6479;
+  --outline: #B7C0D2;
+  --outline-subtle: #D5DBE7;
+  --input-bg: #FFFFFF;
+  --input-border: #747E92;
+  --control-border: #747E92;
+  --messages-area: #E4E7EF;
+  --message-bubble-received: #EEF1F7;
+  /* Cobalt Ink app interaction palette. Domain colours such as status, stage,
+     chart, editor, and integration colours remain intentionally separate. */
+  --accent-solid: #3B66E0;
+  --accent-solid-hover: #3158C8;
+  --accent-foreground: #FFFFFF;
+  --accent-emphasis: #3158C8;
+  --accent-emphasis-hover: #2448AD;
+  --accent-selection: #3B66E0;
+  --accent-soft: rgb(59 102 224 / 0.10);
+  --accent-border-soft: #AFC0F2;
+  --accent-control-ring: #3B66E0;
+  --accent-row-selected: rgb(59 102 224 / 0.06);
+  --accent-range: #DCE5FB;
+  --accent-picker: #E5EBFB;
+  --accent-catalog: #EEF2FC;
+  --accent-indicator: #6F91ED;
+  --accent-active-hover: #DCE5FB;
+  --accent-gradient-end: #6F91ED;
+  --focus-ring: #3B66E0;
+}
+
+/* Dark theme */
+.dark {
+  --page: #0A0D13;
+  --surface: #131822;
+  --surface-alt: #181E2A;
+  --surface-hover: #1E2534;
+  --on-surface: #E4E7EF;
+  --on-surface-secondary: #A9B1C2;
+  --on-surface-muted: #858EA2;
+  --outline: #2C3A52;
+  --outline-subtle: #202A3C;
+  --input-bg: #131822;
+  --input-border: #6B7583;
+  --control-border: #6B7583;
+  --messages-area: #0A0D13;
+  --message-bubble-received: #181E2A;
+  --accent-solid: #3B66E0;
+  --accent-solid-hover: #4973E5;
+  --accent-foreground: #E4E7EF;
+  --accent-emphasis: #5C82EA;
+  --accent-emphasis-hover: #7A9AF0;
+  --accent-selection: #3B66E0;
+  --accent-soft: rgb(59 102 224 / 0.15);
+  --accent-border-soft: #294487;
+  --accent-control-ring: #3B66E0;
+  --accent-row-selected: rgb(59 102 224 / 0.08);
+  --accent-range: #17213A;
+  --accent-picker: #151D31;
+  --accent-catalog: #121A2C;
+  --accent-indicator: #6F91ED;
+  --accent-active-hover: #1A2747;
+  --accent-gradient-end: #6F91ED;
+  --focus-ring: #3B66E0;
+}
+
+/* Scrollbar colors (theme-aware) */
+:root {
+  --scrollbar-thumb: #8E98AA;
+  --scrollbar-thumb-hover: #68748A;
+  --scrollbar-track: transparent;
+}
+
+.dark {
+  --scrollbar-thumb: #35415A;
+  --scrollbar-thumb-hover: #55627A;
+  --scrollbar-track: transparent;
+}
+
+/* Global default scrollbar: every scrollable element in the app gets the thin,
+   rounded, theme-aware scrollbar so they all match without a per-container
+   opt-in. `.scrollbar-hide` and `.styled-scrollbar` below have higher
+   specificity (class selector) and still win where they're applied. */
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+*::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: var(--scrollbar-thumb);
+  border-radius: 4px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background-color: var(--scrollbar-thumb-hover);
+}
+
+/* Firefox: scrollbar-width/color inherit, so setting them on the root styles
+   every scrollable descendant. */
+html {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+}
+
+/* Thin styled scrollbar (explicit alias; identical to the global default). */
+.styled-scrollbar::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.styled-scrollbar::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+}
+
+.styled-scrollbar::-webkit-scrollbar-thumb {
+  background-color: var(--scrollbar-thumb);
+  border-radius: 4px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+.styled-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: var(--scrollbar-thumb-hover);
+}
+
+/* Firefox */
+.styled-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+}
+
+/* Hidden scrollbar (for horizontal scroll containers) */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Highlight animation for manual selection */
+@keyframes highlight {
+  0% {
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(59, 130, 246, 0);
+    transform: scale(1.01);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
+    transform: scale(1);
+  }
+}
+/* Applied to a file row scrolled into view from elsewhere (e.g. a document
+   request's fulfillment list), so the eye finds it among the rest of the folder. */
+.file-row-highlight { animation: highlight 1.4s ease-out; }
+/* Same effect, generic name: for any single element (not a scrolled-to list
+   row) drawn attention to after landing from elsewhere, e.g. a header action
+   button reached via a "Manage X" link on another page. */
+.highlight-pulse { animation: highlight 1.4s ease-out; }
+
+/* Overlay enter/exit animations (modals, dropdown menus), driven by
+   useMountTransition, which keeps the element mounted while the exit plays. */
+@keyframes overlay-backdrop-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes overlay-backdrop-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+/* Fade + zoom-from-95% + slight downward slide, the fade/zoom/slide combo used
+   by Radix/shadcn-style dialogs — probably the most widely copied dialog
+   animation in modern web UI. No overshoot, just a quick, clean settle. */
+@keyframes overlay-card-in {
+  from { opacity: 0; transform: translateY(-8px) scale(0.95); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes overlay-card-out {
+  from { opacity: 1; transform: none; }
+  to { opacity: 0; transform: translateY(-8px) scale(0.95); }
+}
+@keyframes overlay-menu-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes overlay-menu-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+/* Select-style dropdown menus (Dropdown.tsx): a slight grow from the trigger
+   edge (paired with the menu's own `origin-top`) rather than the plain fade
+   every other menu uses. A plain fade on a tall option list reads as barely
+   any motion at all; a bare press-in scale on the trigger button read as too
+   much for a form control. This keeps the "something opened" cue small and
+   independent of how many options are in the list. */
+@keyframes overlay-select-menu-in {
+  from { opacity: 0; transform: scale(0.98); }
+  to { opacity: 1; transform: scale(1); }
+}
+@keyframes overlay-select-menu-out {
+  from { opacity: 1; transform: scale(1); }
+  to { opacity: 0; transform: scale(0.98); }
+}
+
+.overlay-backdrop-enter { animation: overlay-backdrop-in 0.12s ease-out; }
+.overlay-backdrop-exit { animation: overlay-backdrop-out 0.1s ease-in forwards; }
+.overlay-card-enter { animation: overlay-card-in 0.12s ease-out; }
+.overlay-card-exit { animation: overlay-card-out 0.1s ease-in forwards; }
+.overlay-menu-enter { animation: overlay-menu-in 0.15s ease-out; }
+.overlay-menu-exit { animation: overlay-menu-out 0.15s ease-in forwards; }
+.overlay-select-menu-enter { animation: overlay-select-menu-in 0.12s ease-out; }
+.overlay-select-menu-exit { animation: overlay-select-menu-out 0.1s ease-in forwards; }
+
+/* The cookie banner along the bottom edge: it rises into place on arrival and
+   drops back out of view when dismissed, so it leaves the way it came instead
+   of vanishing. Same settle curve as the stage steps. */
+@keyframes cookie-banner-in {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes cookie-banner-out {
+  from { opacity: 1; transform: none; }
+  to { opacity: 0; transform: translateY(24px); }
+}
+.cookie-banner-enter { animation: cookie-banner-in 0.32s cubic-bezier(0.16, 1, 0.3, 1); }
+.cookie-banner-exit { animation: cookie-banner-out 0.2s ease-in forwards; }
+
+/* The rows a capped list hides behind "Show N more", growing and shrinking in
+   place. Same grid-row reveal the collapsible sections use, as an animation
+   rather than a transition: the block is unmounted while collapsed, so there is
+   no resting element for a transition to start from - and none to leave a stray
+   divider or gap under the last visible row either. */
+@keyframes list-overflow-in {
+  from { grid-template-rows: 0fr; }
+  to { grid-template-rows: 1fr; }
+}
+@keyframes list-overflow-out {
+  from { grid-template-rows: 1fr; }
+  to { grid-template-rows: 0fr; }
+}
+.list-overflow-enter { animation: list-overflow-in 0.3s cubic-bezier(0.23, 1, 0.32, 1); }
+.list-overflow-exit { animation: list-overflow-out 0.3s cubic-bezier(0.23, 1, 0.32, 1) forwards; }
+
+/* Stage-pipeline step enter/exit, used by the matter stage bar. A step reached by advancing
+   slides in from the right, and steps abandoned by moving back slide out the
+   same way, so the tracker shows the move instead of jumping to the result.
+   The connector leading into an entering step draws itself left to right. */
+@keyframes stage-step-in {
+  from { opacity: 0; transform: translateX(18px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes stage-step-out {
+  from { opacity: 1; transform: none; }
+  to { opacity: 0; transform: translateX(12px); }
+}
+@keyframes stage-connector-in {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+.stage-step-enter { animation: stage-step-in 0.32s cubic-bezier(0.16, 1, 0.3, 1); }
+.stage-step-exit { animation: stage-step-out 0.2s ease-in forwards; }
+.stage-step-enter .stage-connector {
+  transform-origin: left center;
+  animation: stage-connector-in 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .overlay-backdrop-enter,
+  .overlay-backdrop-exit,
+  .overlay-card-enter,
+  .overlay-card-exit,
+  .overlay-menu-enter,
+  .overlay-menu-exit,
+  .overlay-select-menu-enter,
+  .overlay-select-menu-exit,
+  .cookie-banner-enter,
+  .cookie-banner-exit,
+  .list-overflow-enter,
+  .list-overflow-exit,
+  .stage-step-enter,
+  .stage-step-exit,
+  .stage-step-enter .stage-connector {
+    animation: none !important;
+  }
+}
+
+/* The indeterminate bar, shared by the calendar's range-change indicator and by
+   the upload phases that report no percentage of their own. */
+@keyframes progress-sweep {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(400%); }
+}
+
+/* The sweep's width and animation live here rather than on the element, so the
+   reduced-motion rule below can override both. An inline style or a Tailwind
+   utility would win over the media query and the sweep would keep moving. */
+.progress-sweep {
+  width: 25%;
+  animation: progress-sweep 1.1s ease-in-out infinite;
+}
+
+/* The sweep is decorative. Viewers who have asked for reduced motion get a
+   static partial bar instead, which still reads as "loading" without movement. */
+@media (prefers-reduced-motion: reduce) {
+  .progress-sweep {
+    width: 100%;
+    animation: none;
+    transform: none;
+    opacity: 0.5;
+  }
+}
+
+/* Tiptap Editor Styles */
+.ProseMirror {
+  outline: none;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.ProseMirror p {
+  margin-bottom: 0.5rem;
+  min-height: 1.5rem; /* Ensures empty paragraphs take up space */
+}
+
+.ProseMirror p:first-child {
+  margin-top: 0;
+}
+
+.ProseMirror p:last-child {
+  margin-bottom: 0;
+}
+
+.ProseMirror p:empty::before {
+  content: '\00a0'; /* Non-breaking space to keep empty paragraphs visible */
+}
+
+.ProseMirror br {
+  display: block;
+  content: '';
+  margin-top: 0.5rem;
+}
+
+.ProseMirror h1 {
+  font-size: 1.5em;
+  font-weight: bold;
+  margin: 0.75em 0 0.5em 0;
+}
+
+.ProseMirror h1:first-child {
+  margin-top: 0;
+}
+
+.ProseMirror h2 {
+  font-size: 1.25em;
+  font-weight: bold;
+  margin: 0.75em 0 0.5em 0;
+}
+
+.ProseMirror h2:first-child {
+  margin-top: 0;
+}
+
+.ProseMirror h3 {
+  font-size: 1.1em;
+  font-weight: bold;
+  margin: 0.75em 0 0.5em 0;
+}
+
+.ProseMirror h3:first-child {
+  margin-top: 0;
+}
+
+.ProseMirror ul,
+.ProseMirror ol {
+  padding-left: 1.5em;
+  margin: 0.5em 0;
+}
+
+.ProseMirror ul {
+  list-style-type: disc;
+}
+
+.ProseMirror ol {
+  list-style-type: decimal;
+}
+
+.ProseMirror li {
+  margin: 0.25em 0;
+}
+
+.ProseMirror a {
+  color: #2563eb;
+  text-decoration: underline;
+}
+
+.ProseMirror a:hover {
+  color: #1e40af;
+}
+
+.ProseMirror strong {
+  font-weight: bold;
+}
+
+.ProseMirror em {
+  font-style: italic;
+}
+
+[data-placeholder-chip],
+[data-placeholder-chip] * {
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+[data-placeholder-chip]::selection,
+[data-placeholder-chip] *::selection {
+  background: transparent;
+  color: inherit;
+}
+
+/* Link overlays from PDF import: transparent rects on top of text.
+   Disable pointer events so users can click/select the text underneath. */
+.pdf-page > a {
+  pointer-events: none;
+}
+
+.pdf-page a,
+.pdf-page [data-link-href] {
+  color: #2563eb;
+  text-decoration: underline;
+  cursor: text;
+  -webkit-user-drag: none;
+  user-select: text;
+}
+
+.pdf-page strong {
+  font-weight: bold;
+}
+
+.pdf-page em {
+  font-style: italic;
+}
+
+.pdf-page p br,
+.pdf-page [data-template-text-box-editor] br {
+  display: block;
+  content: '';
+  margin-top: 0.5rem;
+}
+
+.pdf-page ul,
+.pdf-page [data-template-text-box-editor] ul {
+  list-style-type: disc;
+  padding-left: 0;
+  margin: 0;
+}
+
+.pdf-page ol,
+.pdf-page [data-template-text-box-editor] ol {
+  list-style-type: decimal;
+  padding-left: 0;
+  margin: 0;
+}
+
+.pdf-page ul li,
+.pdf-page ol li,
+.pdf-page [data-template-text-box-editor] ul li,
+.pdf-page [data-template-text-box-editor] ol li {
+  padding-left: 0;
+  margin: 0;
+}
+
+.ProseMirror u {
+  text-decoration: underline;
+}
+
+.ProseMirror p.is-editor-empty:first-child::before {
+  color: var(--on-surface-muted);
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+
+/* ===== TIPTAP NEW FEATURES ===== */
+
+/* Task List / Checklist */
+.ProseMirror ul[data-type="taskList"] {
+  list-style: none;
+  padding-left: 0;
+  margin: 0.5rem 0;
+}
+
+.ProseMirror ul[data-type="taskList"] li {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0.25rem 0;
+}
+
+/* `label` must be a flex container itself, not just a flex item: as a plain
+   inline/block box, the inline-block <input> inside it picks up baseline
+   alignment "phantom space" on top of any margin, pushing the checkbox lower
+   than the text next to it. Flex removes that quirk so `align-items: center`
+   on the <li> above centers the checkbox on the text precisely. */
+.ProseMirror ul[data-type="taskList"] li > label {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  user-select: none;
+}
+
+.ProseMirror ul[data-type="taskList"] li > div {
+  flex: 1;
+}
+
+/* Styled to match the app's Checkbox component (src/components/ui/Checkbox.tsx) — this
+   checkbox lives inside Tiptap-generated HTML, so it can't be the React component itself. */
+.ProseMirror ul[data-type="taskList"] input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 1rem;
+  height: 1rem;
+  margin: 0;
+  flex-shrink: 0;
+  border-radius: 0.25rem;
+  border: 1px solid var(--input-border);
+  background-color: var(--input-bg);
+  cursor: pointer;
+  transition: background-color 150ms, border-color 150ms;
+}
+
+.ProseMirror ul[data-type="taskList"] input[type="checkbox"]:checked {
+  background-color: var(--accent-selection);
+  border-color: var(--accent-selection);
+  /* Same checkmark path as Checkbox.tsx's "sm" size (viewBox 0 0 9 7, d="M1 3L3.5 5.5L8 1"). */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='7' viewBox='0 0 9 7' fill='none'%3E%3Cpath d='M1 3L3.5 5.5L8 1' stroke='white' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 9px 7px;
+}
+
+.dark .ProseMirror ul[data-type="taskList"] input[type="checkbox"]:checked {
+  background-color: var(--accent-selection);
+  border-color: var(--accent-selection);
+}
+
+.ProseMirror ul[data-type="taskList"] li[data-checked="true"] > div {
+  text-decoration: line-through;
+  color: var(--on-surface-muted);
+}
+
+/* Highlight - @tiptap/extension-highlight renders each mark with an inline
+   `style="background-color: ...; color: inherit"`, so by default a highlight
+   just inherits the surrounding theme text color. That's fine in light mode
+   (dark text already) but breaks in dark mode, where the inherited color is
+   near-white on top of these light pastel swatches - unreadable, and the
+   reason notes needed the text manually flipped to black after highlighting.
+   The swatch is a fixed light patch (like real highlighter ink), so pin its
+   text to fixed dark ink instead, like a physical highlighter would. This
+   needs !important solely to beat that inline `color: inherit`; an explicit
+   per-run text color (the Color extension's own inline `style="color:..."`
+   on a nested span) still wins, since it's a closer, more specific match. */
+.ProseMirror mark {
+  background-color: #fef08a;
+  color: #111827 !important;
+  padding: 0.125rem 0;
+  border-radius: 0.125rem;
+}
+
+/* Table */
+.ProseMirror table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 1rem 0;
+  table-layout: fixed;
+  overflow: hidden;
+}
+
+.ProseMirror th,
+.ProseMirror td {
+  border: 1px solid var(--outline);
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+  vertical-align: top;
+  min-width: 100px;
+  position: relative;
+}
+
+.ProseMirror th {
+  background-color: var(--surface-alt);
+  font-weight: 600;
+}
+
+.ProseMirror tr:hover td {
+  background-color: var(--surface-hover);
+}
+
+.ProseMirror .selectedCell {
+  background-color: #dbeafe;
+}
+
+.ProseMirror .column-resize-handle {
+  position: absolute;
+  right: -2px;
+  top: 0;
+  bottom: -2px;
+  width: 4px;
+  background-color: #2563eb;
+  pointer-events: none;
+}
+
+/* Text Colors */
+.ProseMirror span[style*="color: rgb(220, 38, 38)"],
+.ProseMirror span[style*="color: #DC2626"] {
+  color: #DC2626 !important;
+}
+
+.ProseMirror span[style*="color: rgb(22, 163, 74)"],
+.ProseMirror span[style*="color: #16A34A"] {
+  color: #16A34A !important;
+}
+
+.ProseMirror span[style*="color: rgb(37, 99, 235)"],
+.ProseMirror span[style*="color: #2563EB"] {
+  color: #2563EB !important;
+}
+
+.ProseMirror span[style*="color: rgb(147, 51, 234)"],
+.ProseMirror span[style*="color: #9333EA"] {
+  color: #9333EA !important;
+}
+
+/* ===== PROSE DISPLAY STYLES (for viewing notes) ===== */
+
+/* Task List in display */
+.prose ul[data-type="taskList"] {
+  list-style: none;
+  padding-left: 0;
+}
+
+.prose ul[data-type="taskList"] li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.prose ul[data-type="taskList"] input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 1rem;
+  height: 1rem;
+  margin: 0.25rem 0 0;
+  flex-shrink: 0;
+  border-radius: 0.25rem;
+  border: 1px solid var(--input-border);
+  background-color: var(--input-bg);
+  cursor: default;
+  pointer-events: none;
+}
+
+.prose ul[data-type="taskList"] input[type="checkbox"]:checked {
+  background-color: var(--accent-selection);
+  border-color: var(--accent-selection);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='7' viewBox='0 0 9 7' fill='none'%3E%3Cpath d='M1 3L3.5 5.5L8 1' stroke='white' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 9px 7px;
+}
+
+.dark .prose ul[data-type="taskList"] input[type="checkbox"]:checked {
+  background-color: var(--accent-selection);
+  border-color: var(--accent-selection);
+}
+
+.prose ul[data-type="taskList"] li[data-checked="true"] > div {
+  text-decoration: line-through;
+  color: var(--on-surface-muted);
+}
+
+/* The main note display (not replies, not version history) lets the reader
+   toggle a checklist item without opening Edit — .checklist-interactive is
+   applied only there, so this stays the only `.prose` context where the
+   checkbox is actually clickable. */
+.note-content.checklist-interactive ul[data-type="taskList"] input[type="checkbox"] {
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+/* Highlight in display - same fixed-ink rationale (and the same need for
+   !important to beat Tiptap's inline `color: inherit`) as .ProseMirror mark above. */
+.prose mark {
+  background-color: #fef08a;
+  color: #111827 !important;
+  padding: 0.125rem 0;
+  border-radius: 0.125rem;
+}
+
+/* Table in display */
+.prose table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 1rem 0;
+}
+
+.prose th,
+.prose td {
+  border: 1px solid var(--outline);
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+}
+
+.prose th {
+  background-color: var(--surface-alt);
+  font-weight: 600;
+}
+
+.prose tr:nth-child(even) {
+  background-color: var(--surface-hover);
+}
+
+/* ===== NOTE CONTENT DISPLAY ===== */
+
+/* Note display - render HTML properly */
+.note-content {
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--on-surface);
+  word-wrap: break-word;
+}
+
+/* Paragraphs - reduce spacing */
+.note-content p {
+  margin-bottom: 0.5rem;
+  min-height: 0.5rem;
+}
+
+.note-content p:empty {
+  margin-bottom: 0.25rem;
+  min-height: 0.5rem;
+  display: block;
+}
+
+/* Bullet Lists - proper styling */
+.note-content ul {
+  list-style-type: disc;
+  padding-left: 1.5rem;
+  margin: 0.25rem 0 0.75rem 0;
+}
+
+.note-content ul li {
+  margin: 0.125rem 0;
+  padding-left: 0.25rem;
+  display: list-item;
+}
+
+/* Numbered Lists */
+.note-content ol {
+  list-style-type: decimal;
+  padding-left: 1.5rem;
+  margin: 0.25rem 0 0.75rem 0;
+}
+
+.note-content ol li {
+  margin: 0.125rem 0;
+  padding-left: 0.25rem;
+  display: list-item;
+}
+
+/* Bold headings in notes */
+.note-content strong {
+  font-weight: 600;
+  color: var(--on-surface);
+}
+
+/* Reduce spacing between sections */
+.note-content p + ul,
+.note-content p + ol {
+  margin-top: 0.125rem;
+}
+
+.note-content ul + p,
+.note-content ol + p {
+  margin-top: 0.5rem;
+}
+
+.note-content br {
+  display: block;
+  content: '';
+  margin-top: 0.25rem;
+}
+
+/* Retracted note/reply content - a plain `line-through` on the wrapper draws its own line AND
+   propagates a second one into descendants, so a large font size inside the rich text (the
+   note editor's font-size mark wraps text as e.g. `<p><span style="font-size:32px">`) ends up
+   with two overlapping strikes: one at the wrapper/paragraph's own (small) font size and another
+   from the span. Turn the decoration off on the wrapper and every candidate element, then
+   re-declare it only on the innermost ("leaf") one for each run of text - the element that does
+   NOT itself contain another candidate - so exactly one line gets drawn, sized off whichever
+   element actually carries the visible font size. skip-ink:none keeps it solid through descenders,
+   and the trailing `:not(:has(> br:only-child))` skips blank editor lines, which would otherwise
+   render as a stray line with no text above/below it. */
+.note-content.line-through,
+.prose.line-through,
+.note-content.line-through :where(h1, h2, h3, h4, h5, h6, p, li, span, strong, em, a),
+.prose.line-through :where(h1, h2, h3, h4, h5, h6, p, li, span, strong, em, a) {
+  text-decoration-line: none;
+}
+
+.note-content.line-through
+  :where(h1, h2, h3, h4, h5, h6, p, li, span, strong, em, a):not(:has(h1, h2, h3, h4, h5, h6, p, li, span, strong, em, a)):not(:has(> br:only-child)),
+.prose.line-through
+  :where(h1, h2, h3, h4, h5, h6, p, li, span, strong, em, a):not(:has(h1, h2, h3, h4, h5, h6, p, li, span, strong, em, a)):not(:has(> br:only-child)) {
+  text-decoration-line: line-through;
+  text-decoration-thickness: 0.08em;
+  text-decoration-skip-ink: none;
+}
+
+/* Preserve multiple line breaks in prose display */
+.prose p {
+  margin-bottom: 0.75rem;
+}
+
+.prose p + p {
+  margin-top: 0.75rem;
+}
+
+.prose br {
+  display: block;
+  content: '';
+  margin-top: 0.5rem;
+}
+
+/*
+ * Normalize native date/time inputs so they match text inputs.
+ * iOS Safari gives date/time controls extra native chrome that makes them
+ * render taller and wider than sibling inputs and ignores width:100% inside
+ * flex/grid, so a date field looks oversized next to the rest of a form.
+ * Stripping the native appearance and clearing the intrinsic min-width makes
+ * them size like every other input while still opening the native picker.
+ */
+input[type='date'],
+input[type='datetime-local'],
+input[type='time'],
+input[type='month'],
+input[type='week'] {
+  -webkit-appearance: none;
+  appearance: none;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+/* iOS renders the value in a nested container with its own margins; reset them
+   so the text sits on the field's baseline like a normal input. */
+input[type='date']::-webkit-date-and-time-value,
+input[type='datetime-local']::-webkit-date-and-time-value,
+input[type='time']::-webkit-date-and-time-value {
+  text-align: left;
+  margin: 0;
+}
+
+/* Keep the calendar/clock picker indicator visible and theme-aware on desktop. */
+input[type='date']::-webkit-calendar-picker-indicator,
+input[type='datetime-local']::-webkit-calendar-picker-indicator,
+input[type='time']::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+}
+.dark input[type='date']::-webkit-calendar-picker-indicator,
+.dark input[type='datetime-local']::-webkit-calendar-picker-indicator,
+.dark input[type='time']::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+}

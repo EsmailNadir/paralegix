@@ -1,0 +1,28 @@
+# Firebase Admin SDK
+serviceAccountKey.json
+*.json.key
+
+# Signing certificate (generated via scripts/generate-signing-cert.ts)
+paralegix-signing.p12
+
+# Environment variables
+.env
+.env.local
+.env.production
+.env.staging
+
+# Dependencies
+node_modules/
+*/node_modules/
+
+# TypeScript build output. Built from src/ by `npm run build`, and rebuilt inside
+# the Docker image, so it is never committed. `dist-test` is the nominal outDir
+# in tsconfig.test.json; ts-jest transforms in memory and never writes it, but it
+# is ignored in case a stray tsc invocation does.
+dist/
+dist-test/
+# Jest coverage output (npm run test:coverage)
+coverage/
+# Stress test: account list and run output (scripts/stress-test/README.md)
+scripts/stress-test/.state.json
+scripts/stress-test/reports/

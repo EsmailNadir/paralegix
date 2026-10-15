@@ -1,0 +1,162 @@
+name: CI
+
+on:
+  workflow_dispatch:
+
+jobs:
+  # Split from the test shards deliberately. These checks are independent of the
+  # suite and take about a minute; running them inside every shard would repeat
+  # that work N times and put it on the critical path of each one.
+  backend-static:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+      - name: Start Postgres
+        run: |
+          docker run --name paralegix-pg \
+            -e POSTGRES_PASSWORD=postgres \
+            -e POSTGRES_DB=paralegix \
+            -p 5433:5432 -d postgres:17
+          until docker exec paralegix-pg pg_isready -U postgres; do sleep 1; done
+      - name: Install dependencies
+        working-directory: backend
+        run: npm ci
+      # One database, not six. The guards only need something to connect to.
+      - name: Build test database
+        working-directory: backend
+        run: TEST_DB_COUNT=1 ./scripts/setup-test-db.sh
+      - name: Static guards
+        working-directory: backend
+        env:
+          DATABASE_URL_LOCAL: postgresql://postgres:postgres@localhost:5433/paralegix_test_1
+          DB_TARGET: local
+        run: |
+          npm run typecheck
+          npm run lint
+          npm run db:schema:check
+          npx tsx db/check-js-count.ts
+          npm run db:drift
+          npm run db:raw-query-ratchet
+          npm run db:user-delete-guards
+          npm run db:files-tree
+          npm run db:coverage-scope-check
+          npm run db:dead-exports
+      # db:drift above introspects ONE database and agrees with whichever path
+      # built it, so it cannot see the two build paths diverging. This can: it
+      # builds a database from db/schema.sql and another from staging plus every
+      # migration since, and compares the catalogs. Needs the baseline ref, which
+      # a shallow checkout does not have.
+      - name: Fetch schema baseline
+        run: git fetch --depth=1 origin staging:refs/remotes/origin/staging
+      - name: Schema build paths agree
+        working-directory: backend
+        run: npm run db:catalog-parity
+
+  backend-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      # Every shard reports. Stopping the others on the first failure hides how
+      # much else is broken, which is the question a red run needs answered.
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+      # Tuned for a database that is thrown away when the job ends, which is the
+      # only reason any of this is safe.
+      #
+      # The suite truncates every table before EVERY test, so truncate cost is
+      # the single largest term in the run. Measured on one host against this
+      # schema, averaged over 20 truncates:
+      #
+      #     stock durability      762 to 946 ms
+      #     the flags below       100 ms
+      #     the flags plus tmpfs   83 to 87 ms
+      #
+      # So these three flags carry the whole win and tmpfs adds about 15% more.
+      # tmpfs is deliberately NOT used: it buys little, it charges the data
+      # directory against the runner's RAM, and when it fills, Postgres fails
+      # with "No space left on device" rather than slowing down.
+      #
+      # fsync, synchronous_commit and full_page_writes exist to survive a crash.
+      # A crashed run here is retried, never recovered, so nothing is at risk.
+      # Do NOT copy these flags to any database whose contents matter.
+      - name: Start Postgres
+        run: |
+          docker run --name paralegix-pg \
+            -e POSTGRES_PASSWORD=postgres \
+            -e POSTGRES_DB=paralegix \
+            -p 5433:5432 -d postgres:17 \
+            -c fsync=off \
+            -c synchronous_commit=off \
+            -c full_page_writes=off \
+            -c max_connections=200
+          until docker exec paralegix-pg pg_isready -U postgres; do sleep 1; done
+      - name: Install dependencies
+        working-directory: backend
+        run: npm ci
+      - name: Build test databases
+        working-directory: backend
+        run: TEST_DB_COUNT=6 ./scripts/setup-test-db.sh
+      # Sharded by spec FILE across four runners, each with its own Postgres, so
+      # the shards cannot interact. Wall clock is the point: the suite is about
+      # 470 s in one job, and the fixed setup either side of it is about 95 s.
+      - name: Unit tests
+        working-directory: backend
+        run: npx jest --selectProjects unit --coverage --shard=${{ matrix.shard }}/4
+      # Codecov merges uploads that share a commit and a flag, so each shard
+      # sends its own partial report and no merge job is needed.
+      - name: Upload backend coverage
+        if: ${{ success() }}
+        uses: codecov/codecov-action@v5
+        with:
+          files: ./backend/coverage/lcov.info
+          flags: backend
+          disable_search: true
+          fail_ci_if_error: true
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
+  frontend:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      TZ: America/Los_Angeles
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Install dependencies
+        working-directory: frontend
+        run: npm ci
+      - name: Static checks
+        working-directory: frontend
+        run: npm run ci:checks
+      - name: Offline unit tests
+        working-directory: frontend
+        run: npm run test:unit -- --coverage
+      - name: Upload frontend coverage
+        if: ${{ success() }}
+        uses: codecov/codecov-action@v5
+        with:
+          files: ./frontend/coverage/lcov.info
+          flags: frontend
+          disable_search: true
+          fail_ci_if_error: true
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}

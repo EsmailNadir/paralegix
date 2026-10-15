@@ -1,0 +1,7344 @@
+{
+ "note": "Inputs and the schedule they must produce, consumed by backend/tests/billing/edge/planScheduleParity.test.ts (the saved plan) and frontend/tests/components/billing/PaymentPlanScheduleParity.test.ts (the preview). Dates are YYYY-MM-DD; a null down payment date is one already collected, which the saved plan dates on the start date.",
+ "cases": [
+  {
+   "name": "four even monthly instalments",
+   "balanceCents": 100000,
+   "values": {
+    "installmentMode": "amount",
+    "paymentCount": "",
+    "installmentAmount": "250",
+    "frequency": "30",
+    "frequencyCustom": "",
+    "startDate": "2026-04-01",
+    "downPayment": "",
+    "downPaymentPaid": false,
+    "downPaymentDueDate": ""
+   },
+   "payload": {
+    "installmentAmount": 250,
+    "frequencyDays": 30,
+    "planStartDate": "2026-04-01"
+   },
+   "rows": [
+    {
+     "date": "2026-04-01",
+     "cents": 25000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-05-01",
+     "cents": 25000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-06-01",
+     "cents": 25000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-07-01",
+     "cents": 25000,
+     "isDownPayment": false
+    }
+   ]
+  },
+  {
+   "name": "remainder lands on the last monthly row",
+   "balanceCents": 100000,
+   "values": {
+    "installmentMode": "amount",
+    "paymentCount": "",
+    "installmentAmount": "300",
+    "frequency": "30",
+    "frequencyCustom": "",
+    "startDate": "2026-04-01",
+    "downPayment": "",
+    "downPaymentPaid": false,
+    "downPaymentDueDate": ""
+   },
+   "payload": {
+    "installmentAmount": 300,
+    "frequencyDays": 30,
+    "planStartDate": "2026-04-01"
+   },
+   "rows": [
+    {
+     "date": "2026-04-01",
+     "cents": 30000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-05-01",
+     "cents": 30000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-06-01",
+     "cents": 30000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-07-01",
+     "cents": 10000,
+     "isDownPayment": false
+    }
+   ]
+  },
+  {
+   "name": "thirds of a hundred in count mode",
+   "balanceCents": 10000,
+   "values": {
+    "installmentMode": "count",
+    "paymentCount": "3",
+    "installmentAmount": "",
+    "frequency": "30",
+    "frequencyCustom": "",
+    "startDate": "2026-04-01",
+    "downPayment": "",
+    "downPaymentPaid": false,
+    "downPaymentDueDate": ""
+   },
+   "payload": {
+    "installmentAmount": 33.34,
+    "frequencyDays": 30,
+    "planStartDate": "2026-04-01"
+   },
+   "rows": [
+    {
+     "date": "2026-04-01",
+     "cents": 3334,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-05-01",
+     "cents": 3334,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-06-01",
+     "cents": 3332,
+     "isDownPayment": false
+    }
+   ]
+  },
+  {
+   "name": "one cent remainder",
+   "balanceCents": 10000,
+   "values": {
+    "installmentMode": "amount",
+    "paymentCount": "",
+    "installmentAmount": "33.33",
+    "frequency": "30",
+    "frequencyCustom": "",
+    "startDate": "2026-06-10",
+    "downPayment": "",
+    "downPaymentPaid": false,
+    "downPaymentDueDate": ""
+   },
+   "payload": {
+    "installmentAmount": 33.33,
+    "frequencyDays": 30,
+    "planStartDate": "2026-06-10"
+   },
+   "rows": [
+    {
+     "date": "2026-06-10",
+     "cents": 3333,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-07-10",
+     "cents": 3333,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-08-10",
+     "cents": 3333,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-09-10",
+     "cents": 1,
+     "isDownPayment": false
+    }
+   ]
+  },
+  {
+   "name": "instalment larger than the balance",
+   "balanceCents": 43210,
+   "values": {
+    "installmentMode": "amount",
+    "paymentCount": "",
+    "installmentAmount": "9999.99",
+    "frequency": "30",
+    "frequencyCustom": "",
+    "startDate": "2026-04-01",
+    "downPayment": "",
+    "downPaymentPaid": false,
+    "downPaymentDueDate": ""
+   },
+   "payload": {
+    "installmentAmount": 9999.99,
+    "frequencyDays": 30,
+    "planStartDate": "2026-04-01"
+   },
+   "rows": [
+    {
+     "date": "2026-04-01",
+     "cents": 43210,
+     "isDownPayment": false
+    }
+   ]
+  },
+  {
+   "name": "instalment exactly the balance",
+   "balanceCents": 43210,
+   "values": {
+    "installmentMode": "amount",
+    "paymentCount": "",
+    "installmentAmount": "432.1",
+    "frequency": "30",
+    "frequencyCustom": "",
+    "startDate": "2026-04-01",
+    "downPayment": "",
+    "downPaymentPaid": false,
+    "downPaymentDueDate": ""
+   },
+   "payload": {
+    "installmentAmount": 432.1,
+    "frequencyDays": 30,
+    "planStartDate": "2026-04-01"
+   },
+   "rows": [
+    {
+     "date": "2026-04-01",
+     "cents": 43210,
+     "isDownPayment": false
+    }
+   ]
+  },
+  {
+   "name": "a single payment in count mode",
+   "balanceCents": 77777,
+   "values": {
+    "installmentMode": "count",
+    "paymentCount": "1",
+    "installmentAmount": "",
+    "frequency": "30",
+    "frequencyCustom": "",
+    "startDate": "2026-04-01",
+    "downPayment": "",
+    "downPaymentPaid": false,
+    "downPaymentDueDate": ""
+   },
+   "payload": {
+    "installmentAmount": 777.77,
+    "frequencyDays": 30,
+    "planStartDate": "2026-04-01"
+   },
+   "rows": [
+    {
+     "date": "2026-04-01",
+     "cents": 77777,
+     "isDownPayment": false
+    }
+   ]
+  },
+  {
+   "name": "weekly",
+   "balanceCents": 120000,
+   "values": {
+    "installmentMode": "amount",
+    "paymentCount": "",
+    "installmentAmount": "100",
+    "frequency": "7",
+    "frequencyCustom": "",
+    "startDate": "2026-03-20",
+    "downPayment": "",
+    "downPaymentPaid": false,
+    "downPaymentDueDate": ""
+   },
+   "payload": {
+    "installmentAmount": 100,
+    "frequencyDays": 7,
+    "planStartDate": "2026-03-20"
+   },
+   "rows": [
+    {
+     "date": "2026-03-20",
+     "cents": 10000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-03-27",
+     "cents": 10000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-04-03",
+     "cents": 10000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-04-10",
+     "cents": 10000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-04-17",
+     "cents": 10000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-04-24",
+     "cents": 10000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-05-01",
+     "cents": 10000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-05-08",
+     "cents": 10000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-05-15",
+     "cents": 10000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-05-22",
+     "cents": 10000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-05-29",
+     "cents": 10000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-06-05",
+     "cents": 10000,
+     "isDownPayment": false
+    }
+   ]
+  },
+  {
+   "name": "every two weeks over the March change",
+   "balanceCents": 120000,
+   "values": {
+    "installmentMode": "amount",
+    "paymentCount": "",
+    "installmentAmount": "150",
+    "frequency": "14",
+    "frequencyCustom": "",
+    "startDate": "2026-03-10",
+    "downPayment": "",
+    "downPaymentPaid": false,
+    "downPaymentDueDate": ""
+   },
+   "payload": {
+    "installmentAmount": 150,
+    "frequencyDays": 14,
+    "planStartDate": "2026-03-10"
+   },
+   "rows": [
+    {
+     "date": "2026-03-10",
+     "cents": 15000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-03-24",
+     "cents": 15000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-04-07",
+     "cents": 15000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-04-21",
+     "cents": 15000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-05-05",
+     "cents": 15000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-05-19",
+     "cents": 15000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-06-02",
+     "cents": 15000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-06-16",
+     "cents": 15000,
+     "isDownPayment": false
+    }
+   ]
+  },
+  {
+   "name": "custom ten days",
+   "balanceCents": 55000,
+   "values": {
+    "installmentMode": "amount",
+    "paymentCount": "",
+    "installmentAmount": "100",
+    "frequency": "custom",
+    "frequencyCustom": "10",
+    "startDate": "2026-10-25",
+    "downPayment": "",
+    "downPaymentPaid": false,
+    "downPaymentDueDate": ""
+   },
+   "payload": {
+    "installmentAmount": 100,
+    "frequencyDays": 10,
+    "planStartDate": "2026-10-25"
+   },
+   "rows": [
+    {
+     "date": "2026-10-25",
+     "cents": 10000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-11-04",
+     "cents": 10000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-11-14",
+     "cents": 10000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-11-24",
+     "cents": 10000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-12-04",
+     "cents": 10000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-12-14",
+     "cents": 5000,
+     "isDownPayment": false
+    }
+   ]
+  },
+  {
+   "name": "daily across the October and November changes",
+   "balanceCents": 60000,
+   "values": {
+    "installmentMode": "amount",
+    "paymentCount": "",
+    "installmentAmount": "50",
+    "frequency": "custom",
+    "frequencyCustom": "1",
+    "startDate": "2026-10-28",
+    "downPayment": "",
+    "downPaymentPaid": false,
+    "downPaymentDueDate": ""
+   },
+   "payload": {
+    "installmentAmount": 50,
+    "frequencyDays": 1,
+    "planStartDate": "2026-10-28"
+   },
+   "rows": [
+    {
+     "date": "2026-10-28",
+     "cents": 5000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-10-29",
+     "cents": 5000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-10-30",
+     "cents": 5000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-10-31",
+     "cents": 5000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-11-01",
+     "cents": 5000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-11-02",
+     "cents": 5000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-11-03",
+     "cents": 5000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-11-04",
+     "cents": 5000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-11-05",
+     "cents": 5000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-11-06",
+     "cents": 5000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-11-07",
+     "cents": 5000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-11-08",
+     "cents": 5000,
+     "isDownPayment": false
+    }
+   ]
+  },
+  {
+   "name": "forty-five days",
+   "balanceCents": 90000,
+   "values": {
+    "installmentMode": "amount",
+    "paymentCount": "",
+    "installmentAmount": "300",
+    "frequency": "custom",
+    "frequencyCustom": "45",
+    "startDate": "2026-02-20",
+    "downPayment": "",
+    "downPaymentPaid": false,
+    "downPaymentDueDate": ""
+   },
+   "payload": {
+    "installmentAmount": 300,
+    "frequencyDays": 45,
+    "planStartDate": "2026-02-20"
+   },
+   "rows": [
+    {
+     "date": "2026-02-20",
+     "cents": 30000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-04-06",
+     "cents": 30000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-05-21",
+     "cents": 30000,
+     "isDownPayment": false
+    }
+   ]
+  },
+  {
+   "name": "three-day cadence over a leap day",
+   "balanceCents": 30000,
+   "values": {
+    "installmentMode": "amount",
+    "paymentCount": "",
+    "installmentAmount": "25",
+    "frequency": "custom",
+    "frequencyCustom": "3",
+    "startDate": "2028-02-20",
+    "downPayment": "",
+    "downPaymentPaid": false,
+    "downPaymentDueDate": ""
+   },
+   "payload": {
+    "installmentAmount": 25,
+    "frequencyDays": 3,
+    "planStartDate": "2028-02-20"
+   },
+   "rows": [
+    {
+     "date": "2028-02-20",
+     "cents": 2500,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-02-23",
+     "cents": 2500,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-02-26",
+     "cents": 2500,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-02-29",
+     "cents": 2500,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-03-03",
+     "cents": 2500,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-03-06",
+     "cents": 2500,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-03-09",
+     "cents": 2500,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-03-12",
+     "cents": 2500,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-03-15",
+     "cents": 2500,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-03-18",
+     "cents": 2500,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-03-21",
+     "cents": 2500,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-03-24",
+     "cents": 2500,
+     "isDownPayment": false
+    }
+   ]
+  },
+  {
+   "name": "monthly across a year boundary",
+   "balanceCents": 40000,
+   "values": {
+    "installmentMode": "amount",
+    "paymentCount": "",
+    "installmentAmount": "100",
+    "frequency": "30",
+    "frequencyCustom": "",
+    "startDate": "2026-12-15",
+    "downPayment": "",
+    "downPaymentPaid": false,
+    "downPaymentDueDate": ""
+   },
+   "payload": {
+    "installmentAmount": 100,
+    "frequencyDays": 30,
+    "planStartDate": "2026-12-15"
+   },
+   "rows": [
+    {
+     "date": "2026-12-15",
+     "cents": 10000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-01-15",
+     "cents": 10000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-02-15",
+     "cents": 10000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-03-15",
+     "cents": 10000,
+     "isDownPayment": false
+    }
+   ]
+  },
+  {
+   "name": "monthly from the 28th through February",
+   "balanceCents": 60000,
+   "values": {
+    "installmentMode": "amount",
+    "paymentCount": "",
+    "installmentAmount": "100",
+    "frequency": "30",
+    "frequencyCustom": "",
+    "startDate": "2026-12-28",
+    "downPayment": "",
+    "downPaymentPaid": false,
+    "downPaymentDueDate": ""
+   },
+   "payload": {
+    "installmentAmount": 100,
+    "frequencyDays": 30,
+    "planStartDate": "2026-12-28"
+   },
+   "rows": [
+    {
+     "date": "2026-12-28",
+     "cents": 10000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-01-28",
+     "cents": 10000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-02-28",
+     "cents": 10000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-03-28",
+     "cents": 10000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-04-28",
+     "cents": 10000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-05-28",
+     "cents": 10000,
+     "isDownPayment": false
+    }
+   ]
+  },
+  {
+   "name": "monthly from the 28th through a leap February",
+   "balanceCents": 60000,
+   "values": {
+    "installmentMode": "amount",
+    "paymentCount": "",
+    "installmentAmount": "100",
+    "frequency": "30",
+    "frequencyCustom": "",
+    "startDate": "2027-12-28",
+    "downPayment": "",
+    "downPaymentPaid": false,
+    "downPaymentDueDate": ""
+   },
+   "payload": {
+    "installmentAmount": 100,
+    "frequencyDays": 30,
+    "planStartDate": "2027-12-28"
+   },
+   "rows": [
+    {
+     "date": "2027-12-28",
+     "cents": 10000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-01-28",
+     "cents": 10000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-02-28",
+     "cents": 10000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-03-28",
+     "cents": 10000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-04-28",
+     "cents": 10000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-05-28",
+     "cents": 10000,
+     "isDownPayment": false
+    }
+   ]
+  },
+  {
+   "name": "monthly from the 31st, two rows only",
+   "balanceCents": 20000,
+   "values": {
+    "installmentMode": "amount",
+    "paymentCount": "",
+    "installmentAmount": "100",
+    "frequency": "30",
+    "frequencyCustom": "",
+    "startDate": "2026-03-31",
+    "downPayment": "",
+    "downPaymentPaid": false,
+    "downPaymentDueDate": ""
+   },
+   "payload": {
+    "installmentAmount": 100,
+    "frequencyDays": 30,
+    "planStartDate": "2026-03-31"
+   },
+   "rows": [
+    {
+     "date": "2026-03-31",
+     "cents": 10000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-04-30",
+     "cents": 10000,
+     "isDownPayment": false
+    }
+   ]
+  },
+  {
+   "name": "monthly from the 30th, two rows only",
+   "balanceCents": 20000,
+   "values": {
+    "installmentMode": "amount",
+    "paymentCount": "",
+    "installmentAmount": "100",
+    "frequency": "30",
+    "frequencyCustom": "",
+    "startDate": "2026-01-30",
+    "downPayment": "",
+    "downPaymentPaid": false,
+    "downPaymentDueDate": ""
+   },
+   "payload": {
+    "installmentAmount": 100,
+    "frequencyDays": 30,
+    "planStartDate": "2026-01-30"
+   },
+   "rows": [
+    {
+     "date": "2026-01-30",
+     "cents": 10000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-02-28",
+     "cents": 10000,
+     "isDownPayment": false
+    }
+   ]
+  },
+  {
+   "name": "monthly from a leap day, twelve rows",
+   "balanceCents": 120000,
+   "values": {
+    "installmentMode": "amount",
+    "paymentCount": "",
+    "installmentAmount": "100",
+    "frequency": "30",
+    "frequencyCustom": "",
+    "startDate": "2028-02-29",
+    "downPayment": "",
+    "downPaymentPaid": false,
+    "downPaymentDueDate": ""
+   },
+   "payload": {
+    "installmentAmount": 100,
+    "frequencyDays": 30,
+    "planStartDate": "2028-02-29"
+   },
+   "rows": [
+    {
+     "date": "2028-02-29",
+     "cents": 10000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-03-29",
+     "cents": 10000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-04-29",
+     "cents": 10000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-05-29",
+     "cents": 10000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-06-29",
+     "cents": 10000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-07-29",
+     "cents": 10000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-08-29",
+     "cents": 10000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-09-29",
+     "cents": 10000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-10-29",
+     "cents": 10000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-11-29",
+     "cents": 10000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-12-29",
+     "cents": 10000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2029-01-29",
+     "cents": 10000,
+     "isDownPayment": false
+    }
+   ]
+  },
+  {
+   "name": "down payment collected, monthly",
+   "balanceCents": 100000,
+   "values": {
+    "installmentMode": "amount",
+    "paymentCount": "",
+    "installmentAmount": "400",
+    "frequency": "30",
+    "frequencyCustom": "",
+    "startDate": "2026-04-10",
+    "downPayment": "200.00",
+    "downPaymentPaid": true,
+    "downPaymentDueDate": ""
+   },
+   "payload": {
+    "installmentAmount": 400,
+    "frequencyDays": 30,
+    "planStartDate": "2026-04-10",
+    "downPaymentAmount": 200,
+    "downPaymentAlreadyPaid": true
+   },
+   "rows": [
+    {
+     "date": null,
+     "cents": 20000,
+     "isDownPayment": true
+    },
+    {
+     "date": "2026-05-10",
+     "cents": 40000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-06-10",
+     "cents": 40000,
+     "isDownPayment": false
+    }
+   ]
+  },
+  {
+   "name": "down payment due later, monthly",
+   "balanceCents": 100000,
+   "values": {
+    "installmentMode": "amount",
+    "paymentCount": "",
+    "installmentAmount": "400",
+    "frequency": "30",
+    "frequencyCustom": "",
+    "startDate": "2026-04-10",
+    "downPayment": "200.00",
+    "downPaymentPaid": false,
+    "downPaymentDueDate": "2026-04-20"
+   },
+   "payload": {
+    "installmentAmount": 400,
+    "frequencyDays": 30,
+    "planStartDate": "2026-04-10",
+    "downPaymentAmount": 200,
+    "downPaymentAlreadyPaid": false,
+    "downPaymentDueDate": "2026-04-20"
+   },
+   "rows": [
+    {
+     "date": "2026-04-20",
+     "cents": 20000,
+     "isDownPayment": true
+    },
+    {
+     "date": "2026-05-10",
+     "cents": 40000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-06-10",
+     "cents": 40000,
+     "isDownPayment": false
+    }
+   ]
+  },
+  {
+   "name": "down payment, weekly",
+   "balanceCents": 100000,
+   "values": {
+    "installmentMode": "amount",
+    "paymentCount": "",
+    "installmentAmount": "250",
+    "frequency": "7",
+    "frequencyCustom": "",
+    "startDate": "2026-03-01",
+    "downPayment": "500.00",
+    "downPaymentPaid": false,
+    "downPaymentDueDate": "2026-03-01"
+   },
+   "payload": {
+    "installmentAmount": 250,
+    "frequencyDays": 7,
+    "planStartDate": "2026-03-01",
+    "downPaymentAmount": 500,
+    "downPaymentAlreadyPaid": false,
+    "downPaymentDueDate": "2026-03-01"
+   },
+   "rows": [
+    {
+     "date": "2026-03-01",
+     "cents": 50000,
+     "isDownPayment": true
+    },
+    {
+     "date": "2026-03-08",
+     "cents": 25000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-03-15",
+     "cents": 25000,
+     "isDownPayment": false
+    }
+   ]
+  },
+  {
+   "name": "down payment in count mode",
+   "balanceCents": 100000,
+   "values": {
+    "installmentMode": "count",
+    "paymentCount": "4",
+    "installmentAmount": "",
+    "frequency": "14",
+    "frequencyCustom": "",
+    "startDate": "2026-05-05",
+    "downPayment": "100.00",
+    "downPaymentPaid": false,
+    "downPaymentDueDate": "2026-05-05"
+   },
+   "payload": {
+    "installmentAmount": 225,
+    "frequencyDays": 14,
+    "planStartDate": "2026-05-05",
+    "downPaymentAmount": 100,
+    "downPaymentAlreadyPaid": false,
+    "downPaymentDueDate": "2026-05-05"
+   },
+   "rows": [
+    {
+     "date": "2026-05-05",
+     "cents": 10000,
+     "isDownPayment": true
+    },
+    {
+     "date": "2026-05-19",
+     "cents": 22500,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-06-02",
+     "cents": 22500,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-06-16",
+     "cents": 22500,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-06-30",
+     "cents": 22500,
+     "isDownPayment": false
+    }
+   ]
+  },
+  {
+   "name": "down payment one cent under the balance",
+   "balanceCents": 50000,
+   "values": {
+    "installmentMode": "amount",
+    "paymentCount": "",
+    "installmentAmount": "100",
+    "frequency": "30",
+    "frequencyCustom": "",
+    "startDate": "2026-04-01",
+    "downPayment": "499.99",
+    "downPaymentPaid": true,
+    "downPaymentDueDate": ""
+   },
+   "payload": {
+    "installmentAmount": 100,
+    "frequencyDays": 30,
+    "planStartDate": "2026-04-01",
+    "downPaymentAmount": 499.99,
+    "downPaymentAlreadyPaid": true
+   },
+   "rows": [
+    {
+     "date": null,
+     "cents": 49999,
+     "isDownPayment": true
+    },
+    {
+     "date": "2026-05-01",
+     "cents": 1,
+     "isDownPayment": false
+    }
+   ]
+  },
+  {
+   "name": "down payment leaving a remainder row",
+   "balanceCents": 100001,
+   "values": {
+    "installmentMode": "amount",
+    "paymentCount": "",
+    "installmentAmount": "300",
+    "frequency": "30",
+    "frequencyCustom": "",
+    "startDate": "2026-07-07",
+    "downPayment": "333.33",
+    "downPaymentPaid": false,
+    "downPaymentDueDate": "2026-07-07"
+   },
+   "payload": {
+    "installmentAmount": 300,
+    "frequencyDays": 30,
+    "planStartDate": "2026-07-07",
+    "downPaymentAmount": 333.33,
+    "downPaymentAlreadyPaid": false,
+    "downPaymentDueDate": "2026-07-07"
+   },
+   "rows": [
+    {
+     "date": "2026-07-07",
+     "cents": 33333,
+     "isDownPayment": true
+    },
+    {
+     "date": "2026-08-07",
+     "cents": 30000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-09-07",
+     "cents": 30000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-10-07",
+     "cents": 6668,
+     "isDownPayment": false
+    }
+   ]
+  },
+  {
+   "name": "tiny balance in cents",
+   "balanceCents": 3,
+   "values": {
+    "installmentMode": "amount",
+    "paymentCount": "",
+    "installmentAmount": "0.01",
+    "frequency": "7",
+    "frequencyCustom": "",
+    "startDate": "2026-04-01",
+    "downPayment": "",
+    "downPaymentPaid": false,
+    "downPaymentDueDate": ""
+   },
+   "payload": {
+    "installmentAmount": 0.01,
+    "frequencyDays": 7,
+    "planStartDate": "2026-04-01"
+   },
+   "rows": [
+    {
+     "date": "2026-04-01",
+     "cents": 1,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-04-08",
+     "cents": 1,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-04-15",
+     "cents": 1,
+     "isDownPayment": false
+    }
+   ]
+  },
+  {
+   "name": "at the 120-row limit",
+   "balanceCents": 120000,
+   "values": {
+    "installmentMode": "amount",
+    "paymentCount": "",
+    "installmentAmount": "10",
+    "frequency": "30",
+    "frequencyCustom": "",
+    "startDate": "2026-01-05",
+    "downPayment": "",
+    "downPaymentPaid": false,
+    "downPaymentDueDate": ""
+   },
+   "payload": {
+    "installmentAmount": 10,
+    "frequencyDays": 30,
+    "planStartDate": "2026-01-05"
+   },
+   "rows": [
+    {
+     "date": "2026-01-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-02-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-03-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-04-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-05-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-06-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-07-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-08-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-09-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-10-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-11-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-12-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-01-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-02-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-03-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-04-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-05-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-06-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-07-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-08-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-09-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-10-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-11-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-12-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-01-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-02-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-03-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-04-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-05-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-06-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-07-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-08-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-09-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-10-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-11-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-12-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2029-01-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2029-02-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2029-03-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2029-04-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2029-05-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2029-06-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2029-07-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2029-08-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2029-09-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2029-10-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2029-11-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2029-12-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2030-01-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2030-02-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2030-03-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2030-04-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2030-05-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2030-06-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2030-07-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2030-08-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2030-09-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2030-10-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2030-11-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2030-12-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2031-01-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2031-02-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2031-03-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2031-04-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2031-05-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2031-06-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2031-07-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2031-08-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2031-09-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2031-10-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2031-11-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2031-12-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2032-01-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2032-02-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2032-03-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2032-04-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2032-05-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2032-06-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2032-07-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2032-08-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2032-09-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2032-10-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2032-11-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2032-12-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2033-01-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2033-02-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2033-03-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2033-04-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2033-05-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2033-06-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2033-07-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2033-08-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2033-09-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2033-10-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2033-11-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2033-12-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2034-01-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2034-02-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2034-03-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2034-04-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2034-05-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2034-06-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2034-07-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2034-08-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2034-09-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2034-10-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2034-11-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2034-12-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2035-01-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2035-02-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2035-03-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2035-04-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2035-05-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2035-06-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2035-07-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2035-08-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2035-09-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2035-10-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2035-11-05",
+     "cents": 1000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2035-12-05",
+     "cents": 1000,
+     "isDownPayment": false
+    }
+   ]
+  },
+  {
+   "name": "count mode with a repeating decimal",
+   "balanceCents": 100001,
+   "values": {
+    "installmentMode": "count",
+    "paymentCount": "7",
+    "installmentAmount": "",
+    "frequency": "30",
+    "frequencyCustom": "",
+    "startDate": "2026-04-01",
+    "downPayment": "",
+    "downPaymentPaid": false,
+    "downPaymentDueDate": ""
+   },
+   "payload": {
+    "installmentAmount": 142.86,
+    "frequencyDays": 30,
+    "planStartDate": "2026-04-01"
+   },
+   "rows": [
+    {
+     "date": "2026-04-01",
+     "cents": 14286,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-05-01",
+     "cents": 14286,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-06-01",
+     "cents": 14286,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-07-01",
+     "cents": 14286,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-08-01",
+     "cents": 14286,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-09-01",
+     "cents": 14286,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-10-01",
+     "cents": 14285,
+     "isDownPayment": false
+    }
+   ]
+  },
+  {
+   "name": "count mode on a large balance",
+   "balanceCents": 987654321,
+   "values": {
+    "installmentMode": "count",
+    "paymentCount": "24",
+    "installmentAmount": "",
+    "frequency": "30",
+    "frequencyCustom": "",
+    "startDate": "2026-04-01",
+    "downPayment": "",
+    "downPaymentPaid": false,
+    "downPaymentDueDate": ""
+   },
+   "payload": {
+    "installmentAmount": 411522.64,
+    "frequencyDays": 30,
+    "planStartDate": "2026-04-01"
+   },
+   "rows": [
+    {
+     "date": "2026-04-01",
+     "cents": 41152264,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-05-01",
+     "cents": 41152264,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-06-01",
+     "cents": 41152264,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-07-01",
+     "cents": 41152264,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-08-01",
+     "cents": 41152264,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-09-01",
+     "cents": 41152264,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-10-01",
+     "cents": 41152264,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-11-01",
+     "cents": 41152264,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-12-01",
+     "cents": 41152264,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-01-01",
+     "cents": 41152264,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-02-01",
+     "cents": 41152264,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-03-01",
+     "cents": 41152264,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-04-01",
+     "cents": 41152264,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-05-01",
+     "cents": 41152264,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-06-01",
+     "cents": 41152264,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-07-01",
+     "cents": 41152264,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-08-01",
+     "cents": 41152264,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-09-01",
+     "cents": 41152264,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-10-01",
+     "cents": 41152264,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-11-01",
+     "cents": 41152264,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-12-01",
+     "cents": 41152264,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-01-01",
+     "cents": 41152264,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-02-01",
+     "cents": 41152264,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-03-01",
+     "cents": 41152249,
+     "isDownPayment": false
+    }
+   ]
+  },
+  {
+   "name": "seeded case 29",
+   "balanceCents": 1373757,
+   "values": {
+    "installmentMode": "count",
+    "paymentCount": "30",
+    "installmentAmount": "",
+    "frequency": "7",
+    "frequencyCustom": "",
+    "startDate": "2027-03-04",
+    "downPayment": "",
+    "downPaymentPaid": false,
+    "downPaymentDueDate": ""
+   },
+   "payload": {
+    "installmentAmount": 457.92,
+    "frequencyDays": 7,
+    "planStartDate": "2027-03-04"
+   },
+   "rows": [
+    {
+     "date": "2027-03-04",
+     "cents": 45792,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-03-11",
+     "cents": 45792,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-03-18",
+     "cents": 45792,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-03-25",
+     "cents": 45792,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-04-01",
+     "cents": 45792,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-04-08",
+     "cents": 45792,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-04-15",
+     "cents": 45792,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-04-22",
+     "cents": 45792,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-04-29",
+     "cents": 45792,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-05-06",
+     "cents": 45792,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-05-13",
+     "cents": 45792,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-05-20",
+     "cents": 45792,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-05-27",
+     "cents": 45792,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-06-03",
+     "cents": 45792,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-06-10",
+     "cents": 45792,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-06-17",
+     "cents": 45792,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-06-24",
+     "cents": 45792,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-07-01",
+     "cents": 45792,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-07-08",
+     "cents": 45792,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-07-15",
+     "cents": 45792,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-07-22",
+     "cents": 45792,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-07-29",
+     "cents": 45792,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-08-05",
+     "cents": 45792,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-08-12",
+     "cents": 45792,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-08-19",
+     "cents": 45792,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-08-26",
+     "cents": 45792,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-09-02",
+     "cents": 45792,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-09-09",
+     "cents": 45792,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-09-16",
+     "cents": 45792,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-09-23",
+     "cents": 45789,
+     "isDownPayment": false
+    }
+   ]
+  },
+  {
+   "name": "seeded case 30",
+   "balanceCents": 1238372,
+   "values": {
+    "installmentMode": "amount",
+    "paymentCount": "",
+    "installmentAmount": "325.89",
+    "frequency": "custom",
+    "frequencyCustom": "3",
+    "startDate": "2026-09-24",
+    "downPayment": "",
+    "downPaymentPaid": false,
+    "downPaymentDueDate": ""
+   },
+   "payload": {
+    "installmentAmount": 325.89,
+    "frequencyDays": 3,
+    "planStartDate": "2026-09-24"
+   },
+   "rows": [
+    {
+     "date": "2026-09-24",
+     "cents": 32589,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-09-27",
+     "cents": 32589,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-09-30",
+     "cents": 32589,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-10-03",
+     "cents": 32589,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-10-06",
+     "cents": 32589,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-10-09",
+     "cents": 32589,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-10-12",
+     "cents": 32589,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-10-15",
+     "cents": 32589,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-10-18",
+     "cents": 32589,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-10-21",
+     "cents": 32589,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-10-24",
+     "cents": 32589,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-10-27",
+     "cents": 32589,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-10-30",
+     "cents": 32589,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-11-02",
+     "cents": 32589,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-11-05",
+     "cents": 32589,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-11-08",
+     "cents": 32589,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-11-11",
+     "cents": 32589,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-11-14",
+     "cents": 32589,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-11-17",
+     "cents": 32589,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-11-20",
+     "cents": 32589,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-11-23",
+     "cents": 32589,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-11-26",
+     "cents": 32589,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-11-29",
+     "cents": 32589,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-12-02",
+     "cents": 32589,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-12-05",
+     "cents": 32589,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-12-08",
+     "cents": 32589,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-12-11",
+     "cents": 32589,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-12-14",
+     "cents": 32589,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-12-17",
+     "cents": 32589,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-12-20",
+     "cents": 32589,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-12-23",
+     "cents": 32589,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-12-26",
+     "cents": 32589,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-12-29",
+     "cents": 32589,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-01-01",
+     "cents": 32589,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-01-04",
+     "cents": 32589,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-01-07",
+     "cents": 32589,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-01-10",
+     "cents": 32589,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-01-13",
+     "cents": 32579,
+     "isDownPayment": false
+    }
+   ]
+  },
+  {
+   "name": "seeded case 31",
+   "balanceCents": 1050962,
+   "values": {
+    "installmentMode": "amount",
+    "paymentCount": "",
+    "installmentAmount": "336.14",
+    "frequency": "7",
+    "frequencyCustom": "",
+    "startDate": "2028-12-21",
+    "downPayment": "2442.35",
+    "downPaymentPaid": true,
+    "downPaymentDueDate": ""
+   },
+   "payload": {
+    "installmentAmount": 336.14,
+    "frequencyDays": 7,
+    "planStartDate": "2028-12-21",
+    "downPaymentAmount": 2442.35,
+    "downPaymentAlreadyPaid": true
+   },
+   "rows": [
+    {
+     "date": null,
+     "cents": 244235,
+     "isDownPayment": true
+    },
+    {
+     "date": "2028-12-28",
+     "cents": 33614,
+     "isDownPayment": false
+    },
+    {
+     "date": "2029-01-04",
+     "cents": 33614,
+     "isDownPayment": false
+    },
+    {
+     "date": "2029-01-11",
+     "cents": 33614,
+     "isDownPayment": false
+    },
+    {
+     "date": "2029-01-18",
+     "cents": 33614,
+     "isDownPayment": false
+    },
+    {
+     "date": "2029-01-25",
+     "cents": 33614,
+     "isDownPayment": false
+    },
+    {
+     "date": "2029-02-01",
+     "cents": 33614,
+     "isDownPayment": false
+    },
+    {
+     "date": "2029-02-08",
+     "cents": 33614,
+     "isDownPayment": false
+    },
+    {
+     "date": "2029-02-15",
+     "cents": 33614,
+     "isDownPayment": false
+    },
+    {
+     "date": "2029-02-22",
+     "cents": 33614,
+     "isDownPayment": false
+    },
+    {
+     "date": "2029-03-01",
+     "cents": 33614,
+     "isDownPayment": false
+    },
+    {
+     "date": "2029-03-08",
+     "cents": 33614,
+     "isDownPayment": false
+    },
+    {
+     "date": "2029-03-15",
+     "cents": 33614,
+     "isDownPayment": false
+    },
+    {
+     "date": "2029-03-22",
+     "cents": 33614,
+     "isDownPayment": false
+    },
+    {
+     "date": "2029-03-29",
+     "cents": 33614,
+     "isDownPayment": false
+    },
+    {
+     "date": "2029-04-05",
+     "cents": 33614,
+     "isDownPayment": false
+    },
+    {
+     "date": "2029-04-12",
+     "cents": 33614,
+     "isDownPayment": false
+    },
+    {
+     "date": "2029-04-19",
+     "cents": 33614,
+     "isDownPayment": false
+    },
+    {
+     "date": "2029-04-26",
+     "cents": 33614,
+     "isDownPayment": false
+    },
+    {
+     "date": "2029-05-03",
+     "cents": 33614,
+     "isDownPayment": false
+    },
+    {
+     "date": "2029-05-10",
+     "cents": 33614,
+     "isDownPayment": false
+    },
+    {
+     "date": "2029-05-17",
+     "cents": 33614,
+     "isDownPayment": false
+    },
+    {
+     "date": "2029-05-24",
+     "cents": 33614,
+     "isDownPayment": false
+    },
+    {
+     "date": "2029-05-31",
+     "cents": 33614,
+     "isDownPayment": false
+    },
+    {
+     "date": "2029-06-07",
+     "cents": 33605,
+     "isDownPayment": false
+    }
+   ]
+  },
+  {
+   "name": "seeded case 32",
+   "balanceCents": 1268717,
+   "values": {
+    "installmentMode": "count",
+    "paymentCount": "27",
+    "installmentAmount": "",
+    "frequency": "custom",
+    "frequencyCustom": "3",
+    "startDate": "2026-01-16",
+    "downPayment": "4878.77",
+    "downPaymentPaid": false,
+    "downPaymentDueDate": "2026-01-17"
+   },
+   "payload": {
+    "installmentAmount": 289.2,
+    "frequencyDays": 3,
+    "planStartDate": "2026-01-16",
+    "downPaymentAmount": 4878.77,
+    "downPaymentAlreadyPaid": false,
+    "downPaymentDueDate": "2026-01-17"
+   },
+   "rows": [
+    {
+     "date": "2026-01-17",
+     "cents": 487877,
+     "isDownPayment": true
+    },
+    {
+     "date": "2026-01-19",
+     "cents": 28920,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-01-22",
+     "cents": 28920,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-01-25",
+     "cents": 28920,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-01-28",
+     "cents": 28920,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-01-31",
+     "cents": 28920,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-02-03",
+     "cents": 28920,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-02-06",
+     "cents": 28920,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-02-09",
+     "cents": 28920,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-02-12",
+     "cents": 28920,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-02-15",
+     "cents": 28920,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-02-18",
+     "cents": 28920,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-02-21",
+     "cents": 28920,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-02-24",
+     "cents": 28920,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-02-27",
+     "cents": 28920,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-03-02",
+     "cents": 28920,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-03-05",
+     "cents": 28920,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-03-08",
+     "cents": 28920,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-03-11",
+     "cents": 28920,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-03-14",
+     "cents": 28920,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-03-17",
+     "cents": 28920,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-03-20",
+     "cents": 28920,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-03-23",
+     "cents": 28920,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-03-26",
+     "cents": 28920,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-03-29",
+     "cents": 28920,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-04-01",
+     "cents": 28920,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-04-04",
+     "cents": 28920,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-04-07",
+     "cents": 28920,
+     "isDownPayment": false
+    }
+   ]
+  },
+  {
+   "name": "seeded case 33",
+   "balanceCents": 763788,
+   "values": {
+    "installmentMode": "count",
+    "paymentCount": "31",
+    "installmentAmount": "",
+    "frequency": "custom",
+    "frequencyCustom": "3",
+    "startDate": "2028-06-12",
+    "downPayment": "",
+    "downPaymentPaid": false,
+    "downPaymentDueDate": ""
+   },
+   "payload": {
+    "installmentAmount": 246.39,
+    "frequencyDays": 3,
+    "planStartDate": "2028-06-12"
+   },
+   "rows": [
+    {
+     "date": "2028-06-12",
+     "cents": 24639,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-06-15",
+     "cents": 24639,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-06-18",
+     "cents": 24639,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-06-21",
+     "cents": 24639,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-06-24",
+     "cents": 24639,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-06-27",
+     "cents": 24639,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-06-30",
+     "cents": 24639,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-07-03",
+     "cents": 24639,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-07-06",
+     "cents": 24639,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-07-09",
+     "cents": 24639,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-07-12",
+     "cents": 24639,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-07-15",
+     "cents": 24639,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-07-18",
+     "cents": 24639,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-07-21",
+     "cents": 24639,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-07-24",
+     "cents": 24639,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-07-27",
+     "cents": 24639,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-07-30",
+     "cents": 24639,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-08-02",
+     "cents": 24639,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-08-05",
+     "cents": 24639,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-08-08",
+     "cents": 24639,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-08-11",
+     "cents": 24639,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-08-14",
+     "cents": 24639,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-08-17",
+     "cents": 24639,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-08-20",
+     "cents": 24639,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-08-23",
+     "cents": 24639,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-08-26",
+     "cents": 24639,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-08-29",
+     "cents": 24639,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-09-01",
+     "cents": 24639,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-09-04",
+     "cents": 24639,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-09-07",
+     "cents": 24639,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-09-10",
+     "cents": 24618,
+     "isDownPayment": false
+    }
+   ]
+  },
+  {
+   "name": "seeded case 34",
+   "balanceCents": 1948421,
+   "values": {
+    "installmentMode": "count",
+    "paymentCount": "34",
+    "installmentAmount": "",
+    "frequency": "custom",
+    "frequencyCustom": "45",
+    "startDate": "2028-12-04",
+    "downPayment": "",
+    "downPaymentPaid": false,
+    "downPaymentDueDate": ""
+   },
+   "payload": {
+    "installmentAmount": 573.07,
+    "frequencyDays": 45,
+    "planStartDate": "2028-12-04"
+   },
+   "rows": [
+    {
+     "date": "2028-12-04",
+     "cents": 57307,
+     "isDownPayment": false
+    },
+    {
+     "date": "2029-01-18",
+     "cents": 57307,
+     "isDownPayment": false
+    },
+    {
+     "date": "2029-03-04",
+     "cents": 57307,
+     "isDownPayment": false
+    },
+    {
+     "date": "2029-04-18",
+     "cents": 57307,
+     "isDownPayment": false
+    },
+    {
+     "date": "2029-06-02",
+     "cents": 57307,
+     "isDownPayment": false
+    },
+    {
+     "date": "2029-07-17",
+     "cents": 57307,
+     "isDownPayment": false
+    },
+    {
+     "date": "2029-08-31",
+     "cents": 57307,
+     "isDownPayment": false
+    },
+    {
+     "date": "2029-10-15",
+     "cents": 57307,
+     "isDownPayment": false
+    },
+    {
+     "date": "2029-11-29",
+     "cents": 57307,
+     "isDownPayment": false
+    },
+    {
+     "date": "2030-01-13",
+     "cents": 57307,
+     "isDownPayment": false
+    },
+    {
+     "date": "2030-02-27",
+     "cents": 57307,
+     "isDownPayment": false
+    },
+    {
+     "date": "2030-04-13",
+     "cents": 57307,
+     "isDownPayment": false
+    },
+    {
+     "date": "2030-05-28",
+     "cents": 57307,
+     "isDownPayment": false
+    },
+    {
+     "date": "2030-07-12",
+     "cents": 57307,
+     "isDownPayment": false
+    },
+    {
+     "date": "2030-08-26",
+     "cents": 57307,
+     "isDownPayment": false
+    },
+    {
+     "date": "2030-10-10",
+     "cents": 57307,
+     "isDownPayment": false
+    },
+    {
+     "date": "2030-11-24",
+     "cents": 57307,
+     "isDownPayment": false
+    },
+    {
+     "date": "2031-01-08",
+     "cents": 57307,
+     "isDownPayment": false
+    },
+    {
+     "date": "2031-02-22",
+     "cents": 57307,
+     "isDownPayment": false
+    },
+    {
+     "date": "2031-04-08",
+     "cents": 57307,
+     "isDownPayment": false
+    },
+    {
+     "date": "2031-05-23",
+     "cents": 57307,
+     "isDownPayment": false
+    },
+    {
+     "date": "2031-07-07",
+     "cents": 57307,
+     "isDownPayment": false
+    },
+    {
+     "date": "2031-08-21",
+     "cents": 57307,
+     "isDownPayment": false
+    },
+    {
+     "date": "2031-10-05",
+     "cents": 57307,
+     "isDownPayment": false
+    },
+    {
+     "date": "2031-11-19",
+     "cents": 57307,
+     "isDownPayment": false
+    },
+    {
+     "date": "2032-01-03",
+     "cents": 57307,
+     "isDownPayment": false
+    },
+    {
+     "date": "2032-02-17",
+     "cents": 57307,
+     "isDownPayment": false
+    },
+    {
+     "date": "2032-04-02",
+     "cents": 57307,
+     "isDownPayment": false
+    },
+    {
+     "date": "2032-05-17",
+     "cents": 57307,
+     "isDownPayment": false
+    },
+    {
+     "date": "2032-07-01",
+     "cents": 57307,
+     "isDownPayment": false
+    },
+    {
+     "date": "2032-08-15",
+     "cents": 57307,
+     "isDownPayment": false
+    },
+    {
+     "date": "2032-09-29",
+     "cents": 57307,
+     "isDownPayment": false
+    },
+    {
+     "date": "2032-11-13",
+     "cents": 57307,
+     "isDownPayment": false
+    },
+    {
+     "date": "2032-12-28",
+     "cents": 57290,
+     "isDownPayment": false
+    }
+   ]
+  },
+  {
+   "name": "seeded case 35",
+   "balanceCents": 619046,
+   "values": {
+    "installmentMode": "count",
+    "paymentCount": "20",
+    "installmentAmount": "",
+    "frequency": "custom",
+    "frequencyCustom": "3",
+    "startDate": "2026-11-06",
+    "downPayment": "2243.00",
+    "downPaymentPaid": false,
+    "downPaymentDueDate": "2026-11-23"
+   },
+   "payload": {
+    "installmentAmount": 197.38,
+    "frequencyDays": 3,
+    "planStartDate": "2026-11-06",
+    "downPaymentAmount": 2243,
+    "downPaymentAlreadyPaid": false,
+    "downPaymentDueDate": "2026-11-23"
+   },
+   "rows": [
+    {
+     "date": "2026-11-23",
+     "cents": 224300,
+     "isDownPayment": true
+    },
+    {
+     "date": "2026-11-09",
+     "cents": 19738,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-11-12",
+     "cents": 19738,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-11-15",
+     "cents": 19738,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-11-18",
+     "cents": 19738,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-11-21",
+     "cents": 19738,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-11-24",
+     "cents": 19738,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-11-27",
+     "cents": 19738,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-11-30",
+     "cents": 19738,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-12-03",
+     "cents": 19738,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-12-06",
+     "cents": 19738,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-12-09",
+     "cents": 19738,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-12-12",
+     "cents": 19738,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-12-15",
+     "cents": 19738,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-12-18",
+     "cents": 19738,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-12-21",
+     "cents": 19738,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-12-24",
+     "cents": 19738,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-12-27",
+     "cents": 19738,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-12-30",
+     "cents": 19738,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-01-02",
+     "cents": 19738,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-01-05",
+     "cents": 19724,
+     "isDownPayment": false
+    }
+   ]
+  },
+  {
+   "name": "seeded case 36",
+   "balanceCents": 396424,
+   "values": {
+    "installmentMode": "amount",
+    "paymentCount": "",
+    "installmentAmount": "132.14",
+    "frequency": "14",
+    "frequencyCustom": "",
+    "startDate": "2028-03-17",
+    "downPayment": "",
+    "downPaymentPaid": false,
+    "downPaymentDueDate": ""
+   },
+   "payload": {
+    "installmentAmount": 132.14,
+    "frequencyDays": 14,
+    "planStartDate": "2028-03-17"
+   },
+   "rows": [
+    {
+     "date": "2028-03-17",
+     "cents": 13214,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-03-31",
+     "cents": 13214,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-04-14",
+     "cents": 13214,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-04-28",
+     "cents": 13214,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-05-12",
+     "cents": 13214,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-05-26",
+     "cents": 13214,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-06-09",
+     "cents": 13214,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-06-23",
+     "cents": 13214,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-07-07",
+     "cents": 13214,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-07-21",
+     "cents": 13214,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-08-04",
+     "cents": 13214,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-08-18",
+     "cents": 13214,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-09-01",
+     "cents": 13214,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-09-15",
+     "cents": 13214,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-09-29",
+     "cents": 13214,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-10-13",
+     "cents": 13214,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-10-27",
+     "cents": 13214,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-11-10",
+     "cents": 13214,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-11-24",
+     "cents": 13214,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-12-08",
+     "cents": 13214,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-12-22",
+     "cents": 13214,
+     "isDownPayment": false
+    },
+    {
+     "date": "2029-01-05",
+     "cents": 13214,
+     "isDownPayment": false
+    },
+    {
+     "date": "2029-01-19",
+     "cents": 13214,
+     "isDownPayment": false
+    },
+    {
+     "date": "2029-02-02",
+     "cents": 13214,
+     "isDownPayment": false
+    },
+    {
+     "date": "2029-02-16",
+     "cents": 13214,
+     "isDownPayment": false
+    },
+    {
+     "date": "2029-03-02",
+     "cents": 13214,
+     "isDownPayment": false
+    },
+    {
+     "date": "2029-03-16",
+     "cents": 13214,
+     "isDownPayment": false
+    },
+    {
+     "date": "2029-03-30",
+     "cents": 13214,
+     "isDownPayment": false
+    },
+    {
+     "date": "2029-04-13",
+     "cents": 13214,
+     "isDownPayment": false
+    },
+    {
+     "date": "2029-04-27",
+     "cents": 13214,
+     "isDownPayment": false
+    },
+    {
+     "date": "2029-05-11",
+     "cents": 4,
+     "isDownPayment": false
+    }
+   ]
+  },
+  {
+   "name": "seeded case 37",
+   "balanceCents": 1600375,
+   "values": {
+    "installmentMode": "amount",
+    "paymentCount": "",
+    "installmentAmount": "695.82",
+    "frequency": "custom",
+    "frequencyCustom": "21",
+    "startDate": "2028-10-17",
+    "downPayment": "",
+    "downPaymentPaid": false,
+    "downPaymentDueDate": ""
+   },
+   "payload": {
+    "installmentAmount": 695.82,
+    "frequencyDays": 21,
+    "planStartDate": "2028-10-17"
+   },
+   "rows": [
+    {
+     "date": "2028-10-17",
+     "cents": 69582,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-11-07",
+     "cents": 69582,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-11-28",
+     "cents": 69582,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-12-19",
+     "cents": 69582,
+     "isDownPayment": false
+    },
+    {
+     "date": "2029-01-09",
+     "cents": 69582,
+     "isDownPayment": false
+    },
+    {
+     "date": "2029-01-30",
+     "cents": 69582,
+     "isDownPayment": false
+    },
+    {
+     "date": "2029-02-20",
+     "cents": 69582,
+     "isDownPayment": false
+    },
+    {
+     "date": "2029-03-13",
+     "cents": 69582,
+     "isDownPayment": false
+    },
+    {
+     "date": "2029-04-03",
+     "cents": 69582,
+     "isDownPayment": false
+    },
+    {
+     "date": "2029-04-24",
+     "cents": 69582,
+     "isDownPayment": false
+    },
+    {
+     "date": "2029-05-15",
+     "cents": 69582,
+     "isDownPayment": false
+    },
+    {
+     "date": "2029-06-05",
+     "cents": 69582,
+     "isDownPayment": false
+    },
+    {
+     "date": "2029-06-26",
+     "cents": 69582,
+     "isDownPayment": false
+    },
+    {
+     "date": "2029-07-17",
+     "cents": 69582,
+     "isDownPayment": false
+    },
+    {
+     "date": "2029-08-07",
+     "cents": 69582,
+     "isDownPayment": false
+    },
+    {
+     "date": "2029-08-28",
+     "cents": 69582,
+     "isDownPayment": false
+    },
+    {
+     "date": "2029-09-18",
+     "cents": 69582,
+     "isDownPayment": false
+    },
+    {
+     "date": "2029-10-09",
+     "cents": 69582,
+     "isDownPayment": false
+    },
+    {
+     "date": "2029-10-30",
+     "cents": 69582,
+     "isDownPayment": false
+    },
+    {
+     "date": "2029-11-20",
+     "cents": 69582,
+     "isDownPayment": false
+    },
+    {
+     "date": "2029-12-11",
+     "cents": 69582,
+     "isDownPayment": false
+    },
+    {
+     "date": "2030-01-01",
+     "cents": 69582,
+     "isDownPayment": false
+    },
+    {
+     "date": "2030-01-22",
+     "cents": 69571,
+     "isDownPayment": false
+    }
+   ]
+  },
+  {
+   "name": "seeded case 38",
+   "balanceCents": 205877,
+   "values": {
+    "installmentMode": "amount",
+    "paymentCount": "",
+    "installmentAmount": "59.54",
+    "frequency": "30",
+    "frequencyCustom": "",
+    "startDate": "2026-10-15",
+    "downPayment": "927.44",
+    "downPaymentPaid": false,
+    "downPaymentDueDate": "2026-10-15"
+   },
+   "payload": {
+    "installmentAmount": 59.54,
+    "frequencyDays": 30,
+    "planStartDate": "2026-10-15",
+    "downPaymentAmount": 927.44,
+    "downPaymentAlreadyPaid": false,
+    "downPaymentDueDate": "2026-10-15"
+   },
+   "rows": [
+    {
+     "date": "2026-10-15",
+     "cents": 92744,
+     "isDownPayment": true
+    },
+    {
+     "date": "2026-11-15",
+     "cents": 5954,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-12-15",
+     "cents": 5954,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-01-15",
+     "cents": 5954,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-02-15",
+     "cents": 5954,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-03-15",
+     "cents": 5954,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-04-15",
+     "cents": 5954,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-05-15",
+     "cents": 5954,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-06-15",
+     "cents": 5954,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-07-15",
+     "cents": 5954,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-08-15",
+     "cents": 5954,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-09-15",
+     "cents": 5954,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-10-15",
+     "cents": 5954,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-11-15",
+     "cents": 5954,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-12-15",
+     "cents": 5954,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-01-15",
+     "cents": 5954,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-02-15",
+     "cents": 5954,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-03-15",
+     "cents": 5954,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-04-15",
+     "cents": 5954,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-05-15",
+     "cents": 5954,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-06-15",
+     "cents": 7,
+     "isDownPayment": false
+    }
+   ]
+  },
+  {
+   "name": "seeded case 39",
+   "balanceCents": 1470919,
+   "values": {
+    "installmentMode": "amount",
+    "paymentCount": "",
+    "installmentAmount": "668.6",
+    "frequency": "30",
+    "frequencyCustom": "",
+    "startDate": "2026-11-16",
+    "downPayment": "",
+    "downPaymentPaid": false,
+    "downPaymentDueDate": ""
+   },
+   "payload": {
+    "installmentAmount": 668.6,
+    "frequencyDays": 30,
+    "planStartDate": "2026-11-16"
+   },
+   "rows": [
+    {
+     "date": "2026-11-16",
+     "cents": 66860,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-12-16",
+     "cents": 66860,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-01-16",
+     "cents": 66860,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-02-16",
+     "cents": 66860,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-03-16",
+     "cents": 66860,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-04-16",
+     "cents": 66860,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-05-16",
+     "cents": 66860,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-06-16",
+     "cents": 66860,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-07-16",
+     "cents": 66860,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-08-16",
+     "cents": 66860,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-09-16",
+     "cents": 66860,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-10-16",
+     "cents": 66860,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-11-16",
+     "cents": 66860,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-12-16",
+     "cents": 66860,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-01-16",
+     "cents": 66860,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-02-16",
+     "cents": 66860,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-03-16",
+     "cents": 66860,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-04-16",
+     "cents": 66860,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-05-16",
+     "cents": 66860,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-06-16",
+     "cents": 66860,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-07-16",
+     "cents": 66860,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-08-16",
+     "cents": 66859,
+     "isDownPayment": false
+    }
+   ]
+  },
+  {
+   "name": "seeded case 40",
+   "balanceCents": 596875,
+   "values": {
+    "installmentMode": "count",
+    "paymentCount": "34",
+    "installmentAmount": "",
+    "frequency": "14",
+    "frequencyCustom": "",
+    "startDate": "2027-09-24",
+    "downPayment": "",
+    "downPaymentPaid": false,
+    "downPaymentDueDate": ""
+   },
+   "payload": {
+    "installmentAmount": 175.56,
+    "frequencyDays": 14,
+    "planStartDate": "2027-09-24"
+   },
+   "rows": [
+    {
+     "date": "2027-09-24",
+     "cents": 17556,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-10-08",
+     "cents": 17556,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-10-22",
+     "cents": 17556,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-11-05",
+     "cents": 17556,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-11-19",
+     "cents": 17556,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-12-03",
+     "cents": 17556,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-12-17",
+     "cents": 17556,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-12-31",
+     "cents": 17556,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-01-14",
+     "cents": 17556,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-01-28",
+     "cents": 17556,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-02-11",
+     "cents": 17556,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-02-25",
+     "cents": 17556,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-03-10",
+     "cents": 17556,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-03-24",
+     "cents": 17556,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-04-07",
+     "cents": 17556,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-04-21",
+     "cents": 17556,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-05-05",
+     "cents": 17556,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-05-19",
+     "cents": 17556,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-06-02",
+     "cents": 17556,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-06-16",
+     "cents": 17556,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-06-30",
+     "cents": 17556,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-07-14",
+     "cents": 17556,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-07-28",
+     "cents": 17556,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-08-11",
+     "cents": 17556,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-08-25",
+     "cents": 17556,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-09-08",
+     "cents": 17556,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-09-22",
+     "cents": 17556,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-10-06",
+     "cents": 17556,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-10-20",
+     "cents": 17556,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-11-03",
+     "cents": 17556,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-11-17",
+     "cents": 17556,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-12-01",
+     "cents": 17556,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-12-15",
+     "cents": 17556,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-12-29",
+     "cents": 17527,
+     "isDownPayment": false
+    }
+   ]
+  },
+  {
+   "name": "seeded case 41",
+   "balanceCents": 1745896,
+   "values": {
+    "installmentMode": "count",
+    "paymentCount": "25",
+    "installmentAmount": "",
+    "frequency": "custom",
+    "frequencyCustom": "45",
+    "startDate": "2026-02-18",
+    "downPayment": "",
+    "downPaymentPaid": false,
+    "downPaymentDueDate": ""
+   },
+   "payload": {
+    "installmentAmount": 698.36,
+    "frequencyDays": 45,
+    "planStartDate": "2026-02-18"
+   },
+   "rows": [
+    {
+     "date": "2026-02-18",
+     "cents": 69836,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-04-04",
+     "cents": 69836,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-05-19",
+     "cents": 69836,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-07-03",
+     "cents": 69836,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-08-17",
+     "cents": 69836,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-10-01",
+     "cents": 69836,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-11-15",
+     "cents": 69836,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-12-30",
+     "cents": 69836,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-02-13",
+     "cents": 69836,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-03-30",
+     "cents": 69836,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-05-14",
+     "cents": 69836,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-06-28",
+     "cents": 69836,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-08-12",
+     "cents": 69836,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-09-26",
+     "cents": 69836,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-11-10",
+     "cents": 69836,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-12-25",
+     "cents": 69836,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-02-08",
+     "cents": 69836,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-03-24",
+     "cents": 69836,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-05-08",
+     "cents": 69836,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-06-22",
+     "cents": 69836,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-08-06",
+     "cents": 69836,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-09-20",
+     "cents": 69836,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-11-04",
+     "cents": 69836,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-12-19",
+     "cents": 69836,
+     "isDownPayment": false
+    },
+    {
+     "date": "2029-02-02",
+     "cents": 69832,
+     "isDownPayment": false
+    }
+   ]
+  },
+  {
+   "name": "seeded case 42",
+   "balanceCents": 1351322,
+   "values": {
+    "installmentMode": "count",
+    "paymentCount": "25",
+    "installmentAmount": "",
+    "frequency": "30",
+    "frequencyCustom": "",
+    "startDate": "2026-05-02",
+    "downPayment": "1012.29",
+    "downPaymentPaid": false,
+    "downPaymentDueDate": "2026-05-17"
+   },
+   "payload": {
+    "installmentAmount": 500.04,
+    "frequencyDays": 30,
+    "planStartDate": "2026-05-02",
+    "downPaymentAmount": 1012.29,
+    "downPaymentAlreadyPaid": false,
+    "downPaymentDueDate": "2026-05-17"
+   },
+   "rows": [
+    {
+     "date": "2026-05-17",
+     "cents": 101229,
+     "isDownPayment": true
+    },
+    {
+     "date": "2026-06-02",
+     "cents": 50004,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-07-02",
+     "cents": 50004,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-08-02",
+     "cents": 50004,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-09-02",
+     "cents": 50004,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-10-02",
+     "cents": 50004,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-11-02",
+     "cents": 50004,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-12-02",
+     "cents": 50004,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-01-02",
+     "cents": 50004,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-02-02",
+     "cents": 50004,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-03-02",
+     "cents": 50004,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-04-02",
+     "cents": 50004,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-05-02",
+     "cents": 50004,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-06-02",
+     "cents": 50004,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-07-02",
+     "cents": 50004,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-08-02",
+     "cents": 50004,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-09-02",
+     "cents": 50004,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-10-02",
+     "cents": 50004,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-11-02",
+     "cents": 50004,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-12-02",
+     "cents": 50004,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-01-02",
+     "cents": 50004,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-02-02",
+     "cents": 50004,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-03-02",
+     "cents": 50004,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-04-02",
+     "cents": 50004,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-05-02",
+     "cents": 50004,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-06-02",
+     "cents": 49997,
+     "isDownPayment": false
+    }
+   ]
+  },
+  {
+   "name": "seeded case 43",
+   "balanceCents": 1983211,
+   "values": {
+    "installmentMode": "count",
+    "paymentCount": "27",
+    "installmentAmount": "",
+    "frequency": "30",
+    "frequencyCustom": "",
+    "startDate": "2026-01-05",
+    "downPayment": "",
+    "downPaymentPaid": false,
+    "downPaymentDueDate": ""
+   },
+   "payload": {
+    "installmentAmount": 734.53,
+    "frequencyDays": 30,
+    "planStartDate": "2026-01-05"
+   },
+   "rows": [
+    {
+     "date": "2026-01-05",
+     "cents": 73453,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-02-05",
+     "cents": 73453,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-03-05",
+     "cents": 73453,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-04-05",
+     "cents": 73453,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-05-05",
+     "cents": 73453,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-06-05",
+     "cents": 73453,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-07-05",
+     "cents": 73453,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-08-05",
+     "cents": 73453,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-09-05",
+     "cents": 73453,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-10-05",
+     "cents": 73453,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-11-05",
+     "cents": 73453,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-12-05",
+     "cents": 73453,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-01-05",
+     "cents": 73453,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-02-05",
+     "cents": 73453,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-03-05",
+     "cents": 73453,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-04-05",
+     "cents": 73453,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-05-05",
+     "cents": 73453,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-06-05",
+     "cents": 73453,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-07-05",
+     "cents": 73453,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-08-05",
+     "cents": 73453,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-09-05",
+     "cents": 73453,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-10-05",
+     "cents": 73453,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-11-05",
+     "cents": 73453,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-12-05",
+     "cents": 73453,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-01-05",
+     "cents": 73453,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-02-05",
+     "cents": 73453,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-03-05",
+     "cents": 73433,
+     "isDownPayment": false
+    }
+   ]
+  },
+  {
+   "name": "seeded case 44",
+   "balanceCents": 345564,
+   "values": {
+    "installmentMode": "count",
+    "paymentCount": "39",
+    "installmentAmount": "",
+    "frequency": "30",
+    "frequencyCustom": "",
+    "startDate": "2026-03-26",
+    "downPayment": "314.35",
+    "downPaymentPaid": true,
+    "downPaymentDueDate": ""
+   },
+   "payload": {
+    "installmentAmount": 80.55,
+    "frequencyDays": 30,
+    "planStartDate": "2026-03-26",
+    "downPaymentAmount": 314.35,
+    "downPaymentAlreadyPaid": true
+   },
+   "rows": [
+    {
+     "date": null,
+     "cents": 31435,
+     "isDownPayment": true
+    },
+    {
+     "date": "2026-04-26",
+     "cents": 8055,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-05-26",
+     "cents": 8055,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-06-26",
+     "cents": 8055,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-07-26",
+     "cents": 8055,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-08-26",
+     "cents": 8055,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-09-26",
+     "cents": 8055,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-10-26",
+     "cents": 8055,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-11-26",
+     "cents": 8055,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-12-26",
+     "cents": 8055,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-01-26",
+     "cents": 8055,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-02-26",
+     "cents": 8055,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-03-26",
+     "cents": 8055,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-04-26",
+     "cents": 8055,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-05-26",
+     "cents": 8055,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-06-26",
+     "cents": 8055,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-07-26",
+     "cents": 8055,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-08-26",
+     "cents": 8055,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-09-26",
+     "cents": 8055,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-10-26",
+     "cents": 8055,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-11-26",
+     "cents": 8055,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-12-26",
+     "cents": 8055,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-01-26",
+     "cents": 8055,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-02-26",
+     "cents": 8055,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-03-26",
+     "cents": 8055,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-04-26",
+     "cents": 8055,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-05-26",
+     "cents": 8055,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-06-26",
+     "cents": 8055,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-07-26",
+     "cents": 8055,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-08-26",
+     "cents": 8055,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-09-26",
+     "cents": 8055,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-10-26",
+     "cents": 8055,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-11-26",
+     "cents": 8055,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-12-26",
+     "cents": 8055,
+     "isDownPayment": false
+    },
+    {
+     "date": "2029-01-26",
+     "cents": 8055,
+     "isDownPayment": false
+    },
+    {
+     "date": "2029-02-26",
+     "cents": 8055,
+     "isDownPayment": false
+    },
+    {
+     "date": "2029-03-26",
+     "cents": 8055,
+     "isDownPayment": false
+    },
+    {
+     "date": "2029-04-26",
+     "cents": 8055,
+     "isDownPayment": false
+    },
+    {
+     "date": "2029-05-26",
+     "cents": 8055,
+     "isDownPayment": false
+    },
+    {
+     "date": "2029-06-26",
+     "cents": 8039,
+     "isDownPayment": false
+    }
+   ]
+  },
+  {
+   "name": "seeded case 45",
+   "balanceCents": 1034149,
+   "values": {
+    "installmentMode": "count",
+    "paymentCount": "1",
+    "installmentAmount": "",
+    "frequency": "30",
+    "frequencyCustom": "",
+    "startDate": "2028-07-04",
+    "downPayment": "4793.47",
+    "downPaymentPaid": false,
+    "downPaymentDueDate": "2028-07-14"
+   },
+   "payload": {
+    "installmentAmount": 5548.02,
+    "frequencyDays": 30,
+    "planStartDate": "2028-07-04",
+    "downPaymentAmount": 4793.47,
+    "downPaymentAlreadyPaid": false,
+    "downPaymentDueDate": "2028-07-14"
+   },
+   "rows": [
+    {
+     "date": "2028-07-14",
+     "cents": 479347,
+     "isDownPayment": true
+    },
+    {
+     "date": "2028-08-04",
+     "cents": 554802,
+     "isDownPayment": false
+    }
+   ]
+  },
+  {
+   "name": "seeded case 46",
+   "balanceCents": 552802,
+   "values": {
+    "installmentMode": "amount",
+    "paymentCount": "",
+    "installmentAmount": "481.91",
+    "frequency": "30",
+    "frequencyCustom": "",
+    "startDate": "2027-01-05",
+    "downPayment": "1190.80",
+    "downPaymentPaid": false,
+    "downPaymentDueDate": "2027-01-11"
+   },
+   "payload": {
+    "installmentAmount": 481.91,
+    "frequencyDays": 30,
+    "planStartDate": "2027-01-05",
+    "downPaymentAmount": 1190.8,
+    "downPaymentAlreadyPaid": false,
+    "downPaymentDueDate": "2027-01-11"
+   },
+   "rows": [
+    {
+     "date": "2027-01-11",
+     "cents": 119080,
+     "isDownPayment": true
+    },
+    {
+     "date": "2027-02-05",
+     "cents": 48191,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-03-05",
+     "cents": 48191,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-04-05",
+     "cents": 48191,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-05-05",
+     "cents": 48191,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-06-05",
+     "cents": 48191,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-07-05",
+     "cents": 48191,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-08-05",
+     "cents": 48191,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-09-05",
+     "cents": 48191,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-10-05",
+     "cents": 48191,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-11-05",
+     "cents": 3,
+     "isDownPayment": false
+    }
+   ]
+  },
+  {
+   "name": "seeded case 47",
+   "balanceCents": 1967946,
+   "values": {
+    "installmentMode": "count",
+    "paymentCount": "4",
+    "installmentAmount": "",
+    "frequency": "30",
+    "frequencyCustom": "",
+    "startDate": "2026-07-11",
+    "downPayment": "",
+    "downPaymentPaid": false,
+    "downPaymentDueDate": ""
+   },
+   "payload": {
+    "installmentAmount": 4919.87,
+    "frequencyDays": 30,
+    "planStartDate": "2026-07-11"
+   },
+   "rows": [
+    {
+     "date": "2026-07-11",
+     "cents": 491987,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-08-11",
+     "cents": 491987,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-09-11",
+     "cents": 491987,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-10-11",
+     "cents": 491985,
+     "isDownPayment": false
+    }
+   ]
+  },
+  {
+   "name": "seeded case 48",
+   "balanceCents": 1734910,
+   "values": {
+    "installmentMode": "amount",
+    "paymentCount": "",
+    "installmentAmount": "1020.54",
+    "frequency": "30",
+    "frequencyCustom": "",
+    "startDate": "2026-06-09",
+    "downPayment": "",
+    "downPaymentPaid": false,
+    "downPaymentDueDate": ""
+   },
+   "payload": {
+    "installmentAmount": 1020.54,
+    "frequencyDays": 30,
+    "planStartDate": "2026-06-09"
+   },
+   "rows": [
+    {
+     "date": "2026-06-09",
+     "cents": 102054,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-07-09",
+     "cents": 102054,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-08-09",
+     "cents": 102054,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-09-09",
+     "cents": 102054,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-10-09",
+     "cents": 102054,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-11-09",
+     "cents": 102054,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-12-09",
+     "cents": 102054,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-01-09",
+     "cents": 102054,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-02-09",
+     "cents": 102054,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-03-09",
+     "cents": 102054,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-04-09",
+     "cents": 102054,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-05-09",
+     "cents": 102054,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-06-09",
+     "cents": 102054,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-07-09",
+     "cents": 102054,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-08-09",
+     "cents": 102054,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-09-09",
+     "cents": 102054,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-10-09",
+     "cents": 102046,
+     "isDownPayment": false
+    }
+   ]
+  },
+  {
+   "name": "seeded case 49",
+   "balanceCents": 932422,
+   "values": {
+    "installmentMode": "count",
+    "paymentCount": "5",
+    "installmentAmount": "",
+    "frequency": "custom",
+    "frequencyCustom": "21",
+    "startDate": "2026-12-19",
+    "downPayment": "4227.74",
+    "downPaymentPaid": false,
+    "downPaymentDueDate": "2027-01-05"
+   },
+   "payload": {
+    "installmentAmount": 1019.3,
+    "frequencyDays": 21,
+    "planStartDate": "2026-12-19",
+    "downPaymentAmount": 4227.74,
+    "downPaymentAlreadyPaid": false,
+    "downPaymentDueDate": "2027-01-05"
+   },
+   "rows": [
+    {
+     "date": "2027-01-05",
+     "cents": 422774,
+     "isDownPayment": true
+    },
+    {
+     "date": "2027-01-09",
+     "cents": 101930,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-01-30",
+     "cents": 101930,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-02-20",
+     "cents": 101930,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-03-13",
+     "cents": 101930,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-04-03",
+     "cents": 101928,
+     "isDownPayment": false
+    }
+   ]
+  },
+  {
+   "name": "seeded case 50",
+   "balanceCents": 1878148,
+   "values": {
+    "installmentMode": "amount",
+    "paymentCount": "",
+    "installmentAmount": "521.71",
+    "frequency": "custom",
+    "frequencyCustom": "3",
+    "startDate": "2028-06-22",
+    "downPayment": "",
+    "downPaymentPaid": false,
+    "downPaymentDueDate": ""
+   },
+   "payload": {
+    "installmentAmount": 521.71,
+    "frequencyDays": 3,
+    "planStartDate": "2028-06-22"
+   },
+   "rows": [
+    {
+     "date": "2028-06-22",
+     "cents": 52171,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-06-25",
+     "cents": 52171,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-06-28",
+     "cents": 52171,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-07-01",
+     "cents": 52171,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-07-04",
+     "cents": 52171,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-07-07",
+     "cents": 52171,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-07-10",
+     "cents": 52171,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-07-13",
+     "cents": 52171,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-07-16",
+     "cents": 52171,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-07-19",
+     "cents": 52171,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-07-22",
+     "cents": 52171,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-07-25",
+     "cents": 52171,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-07-28",
+     "cents": 52171,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-07-31",
+     "cents": 52171,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-08-03",
+     "cents": 52171,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-08-06",
+     "cents": 52171,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-08-09",
+     "cents": 52171,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-08-12",
+     "cents": 52171,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-08-15",
+     "cents": 52171,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-08-18",
+     "cents": 52171,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-08-21",
+     "cents": 52171,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-08-24",
+     "cents": 52171,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-08-27",
+     "cents": 52171,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-08-30",
+     "cents": 52171,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-09-02",
+     "cents": 52171,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-09-05",
+     "cents": 52171,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-09-08",
+     "cents": 52171,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-09-11",
+     "cents": 52171,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-09-14",
+     "cents": 52171,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-09-17",
+     "cents": 52171,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-09-20",
+     "cents": 52171,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-09-23",
+     "cents": 52171,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-09-26",
+     "cents": 52171,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-09-29",
+     "cents": 52171,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-10-02",
+     "cents": 52171,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-10-05",
+     "cents": 52163,
+     "isDownPayment": false
+    }
+   ]
+  },
+  {
+   "name": "seeded case 51",
+   "balanceCents": 94966,
+   "values": {
+    "installmentMode": "count",
+    "paymentCount": "27",
+    "installmentAmount": "",
+    "frequency": "30",
+    "frequencyCustom": "",
+    "startDate": "2026-07-28",
+    "downPayment": "",
+    "downPaymentPaid": false,
+    "downPaymentDueDate": ""
+   },
+   "payload": {
+    "installmentAmount": 35.18,
+    "frequencyDays": 30,
+    "planStartDate": "2026-07-28"
+   },
+   "rows": [
+    {
+     "date": "2026-07-28",
+     "cents": 3518,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-08-28",
+     "cents": 3518,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-09-28",
+     "cents": 3518,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-10-28",
+     "cents": 3518,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-11-28",
+     "cents": 3518,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-12-28",
+     "cents": 3518,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-01-28",
+     "cents": 3518,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-02-28",
+     "cents": 3518,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-03-28",
+     "cents": 3518,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-04-28",
+     "cents": 3518,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-05-28",
+     "cents": 3518,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-06-28",
+     "cents": 3518,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-07-28",
+     "cents": 3518,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-08-28",
+     "cents": 3518,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-09-28",
+     "cents": 3518,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-10-28",
+     "cents": 3518,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-11-28",
+     "cents": 3518,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-12-28",
+     "cents": 3518,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-01-28",
+     "cents": 3518,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-02-28",
+     "cents": 3518,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-03-28",
+     "cents": 3518,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-04-28",
+     "cents": 3518,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-05-28",
+     "cents": 3518,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-06-28",
+     "cents": 3518,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-07-28",
+     "cents": 3518,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-08-28",
+     "cents": 3518,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-09-28",
+     "cents": 3498,
+     "isDownPayment": false
+    }
+   ]
+  },
+  {
+   "name": "seeded case 52",
+   "balanceCents": 1076255,
+   "values": {
+    "installmentMode": "amount",
+    "paymentCount": "",
+    "installmentAmount": "234.73",
+    "frequency": "30",
+    "frequencyCustom": "",
+    "startDate": "2026-07-24",
+    "downPayment": "2312.32",
+    "downPaymentPaid": true,
+    "downPaymentDueDate": ""
+   },
+   "payload": {
+    "installmentAmount": 234.73,
+    "frequencyDays": 30,
+    "planStartDate": "2026-07-24",
+    "downPaymentAmount": 2312.32,
+    "downPaymentAlreadyPaid": true
+   },
+   "rows": [
+    {
+     "date": null,
+     "cents": 231232,
+     "isDownPayment": true
+    },
+    {
+     "date": "2026-08-24",
+     "cents": 23473,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-09-24",
+     "cents": 23473,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-10-24",
+     "cents": 23473,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-11-24",
+     "cents": 23473,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-12-24",
+     "cents": 23473,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-01-24",
+     "cents": 23473,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-02-24",
+     "cents": 23473,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-03-24",
+     "cents": 23473,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-04-24",
+     "cents": 23473,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-05-24",
+     "cents": 23473,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-06-24",
+     "cents": 23473,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-07-24",
+     "cents": 23473,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-08-24",
+     "cents": 23473,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-09-24",
+     "cents": 23473,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-10-24",
+     "cents": 23473,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-11-24",
+     "cents": 23473,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-12-24",
+     "cents": 23473,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-01-24",
+     "cents": 23473,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-02-24",
+     "cents": 23473,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-03-24",
+     "cents": 23473,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-04-24",
+     "cents": 23473,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-05-24",
+     "cents": 23473,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-06-24",
+     "cents": 23473,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-07-24",
+     "cents": 23473,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-08-24",
+     "cents": 23473,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-09-24",
+     "cents": 23473,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-10-24",
+     "cents": 23473,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-11-24",
+     "cents": 23473,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-12-24",
+     "cents": 23473,
+     "isDownPayment": false
+    },
+    {
+     "date": "2029-01-24",
+     "cents": 23473,
+     "isDownPayment": false
+    },
+    {
+     "date": "2029-02-24",
+     "cents": 23473,
+     "isDownPayment": false
+    },
+    {
+     "date": "2029-03-24",
+     "cents": 23473,
+     "isDownPayment": false
+    },
+    {
+     "date": "2029-04-24",
+     "cents": 23473,
+     "isDownPayment": false
+    },
+    {
+     "date": "2029-05-24",
+     "cents": 23473,
+     "isDownPayment": false
+    },
+    {
+     "date": "2029-06-24",
+     "cents": 23473,
+     "isDownPayment": false
+    },
+    {
+     "date": "2029-07-24",
+     "cents": 23468,
+     "isDownPayment": false
+    }
+   ]
+  },
+  {
+   "name": "seeded case 53",
+   "balanceCents": 1237527,
+   "values": {
+    "installmentMode": "amount",
+    "paymentCount": "",
+    "installmentAmount": "623.2",
+    "frequency": "7",
+    "frequencyCustom": "",
+    "startDate": "2028-08-07",
+    "downPayment": "3027.22",
+    "downPaymentPaid": false,
+    "downPaymentDueDate": "2028-08-17"
+   },
+   "payload": {
+    "installmentAmount": 623.2,
+    "frequencyDays": 7,
+    "planStartDate": "2028-08-07",
+    "downPaymentAmount": 3027.22,
+    "downPaymentAlreadyPaid": false,
+    "downPaymentDueDate": "2028-08-17"
+   },
+   "rows": [
+    {
+     "date": "2028-08-17",
+     "cents": 302722,
+     "isDownPayment": true
+    },
+    {
+     "date": "2028-08-14",
+     "cents": 62320,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-08-21",
+     "cents": 62320,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-08-28",
+     "cents": 62320,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-09-04",
+     "cents": 62320,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-09-11",
+     "cents": 62320,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-09-18",
+     "cents": 62320,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-09-25",
+     "cents": 62320,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-10-02",
+     "cents": 62320,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-10-09",
+     "cents": 62320,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-10-16",
+     "cents": 62320,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-10-23",
+     "cents": 62320,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-10-30",
+     "cents": 62320,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-11-06",
+     "cents": 62320,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-11-13",
+     "cents": 62320,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-11-20",
+     "cents": 62320,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-11-27",
+     "cents": 5,
+     "isDownPayment": false
+    }
+   ]
+  },
+  {
+   "name": "seeded case 54",
+   "balanceCents": 1210297,
+   "values": {
+    "installmentMode": "amount",
+    "paymentCount": "",
+    "installmentAmount": "345.81",
+    "frequency": "30",
+    "frequencyCustom": "",
+    "startDate": "2027-01-09",
+    "downPayment": "4840.91",
+    "downPaymentPaid": false,
+    "downPaymentDueDate": "2027-01-23"
+   },
+   "payload": {
+    "installmentAmount": 345.81,
+    "frequencyDays": 30,
+    "planStartDate": "2027-01-09",
+    "downPaymentAmount": 4840.91,
+    "downPaymentAlreadyPaid": false,
+    "downPaymentDueDate": "2027-01-23"
+   },
+   "rows": [
+    {
+     "date": "2027-01-23",
+     "cents": 484091,
+     "isDownPayment": true
+    },
+    {
+     "date": "2027-02-09",
+     "cents": 34581,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-03-09",
+     "cents": 34581,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-04-09",
+     "cents": 34581,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-05-09",
+     "cents": 34581,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-06-09",
+     "cents": 34581,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-07-09",
+     "cents": 34581,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-08-09",
+     "cents": 34581,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-09-09",
+     "cents": 34581,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-10-09",
+     "cents": 34581,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-11-09",
+     "cents": 34581,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-12-09",
+     "cents": 34581,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-01-09",
+     "cents": 34581,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-02-09",
+     "cents": 34581,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-03-09",
+     "cents": 34581,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-04-09",
+     "cents": 34581,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-05-09",
+     "cents": 34581,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-06-09",
+     "cents": 34581,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-07-09",
+     "cents": 34581,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-08-09",
+     "cents": 34581,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-09-09",
+     "cents": 34581,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-10-09",
+     "cents": 34581,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-11-09",
+     "cents": 5,
+     "isDownPayment": false
+    }
+   ]
+  },
+  {
+   "name": "seeded case 55",
+   "balanceCents": 1503667,
+   "values": {
+    "installmentMode": "count",
+    "paymentCount": "33",
+    "installmentAmount": "",
+    "frequency": "7",
+    "frequencyCustom": "",
+    "startDate": "2026-03-23",
+    "downPayment": "",
+    "downPaymentPaid": false,
+    "downPaymentDueDate": ""
+   },
+   "payload": {
+    "installmentAmount": 455.66,
+    "frequencyDays": 7,
+    "planStartDate": "2026-03-23"
+   },
+   "rows": [
+    {
+     "date": "2026-03-23",
+     "cents": 45566,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-03-30",
+     "cents": 45566,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-04-06",
+     "cents": 45566,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-04-13",
+     "cents": 45566,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-04-20",
+     "cents": 45566,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-04-27",
+     "cents": 45566,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-05-04",
+     "cents": 45566,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-05-11",
+     "cents": 45566,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-05-18",
+     "cents": 45566,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-05-25",
+     "cents": 45566,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-06-01",
+     "cents": 45566,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-06-08",
+     "cents": 45566,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-06-15",
+     "cents": 45566,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-06-22",
+     "cents": 45566,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-06-29",
+     "cents": 45566,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-07-06",
+     "cents": 45566,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-07-13",
+     "cents": 45566,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-07-20",
+     "cents": 45566,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-07-27",
+     "cents": 45566,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-08-03",
+     "cents": 45566,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-08-10",
+     "cents": 45566,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-08-17",
+     "cents": 45566,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-08-24",
+     "cents": 45566,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-08-31",
+     "cents": 45566,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-09-07",
+     "cents": 45566,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-09-14",
+     "cents": 45566,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-09-21",
+     "cents": 45566,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-09-28",
+     "cents": 45566,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-10-05",
+     "cents": 45566,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-10-12",
+     "cents": 45566,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-10-19",
+     "cents": 45566,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-10-26",
+     "cents": 45566,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-11-02",
+     "cents": 45555,
+     "isDownPayment": false
+    }
+   ]
+  },
+  {
+   "name": "seeded case 56",
+   "balanceCents": 565301,
+   "values": {
+    "installmentMode": "amount",
+    "paymentCount": "",
+    "installmentAmount": "109.61",
+    "frequency": "14",
+    "frequencyCustom": "",
+    "startDate": "2026-10-26",
+    "downPayment": "1597.49",
+    "downPaymentPaid": false,
+    "downPaymentDueDate": "2026-10-26"
+   },
+   "payload": {
+    "installmentAmount": 109.61,
+    "frequencyDays": 14,
+    "planStartDate": "2026-10-26",
+    "downPaymentAmount": 1597.49,
+    "downPaymentAlreadyPaid": false,
+    "downPaymentDueDate": "2026-10-26"
+   },
+   "rows": [
+    {
+     "date": "2026-10-26",
+     "cents": 159749,
+     "isDownPayment": true
+    },
+    {
+     "date": "2026-11-09",
+     "cents": 10961,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-11-23",
+     "cents": 10961,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-12-07",
+     "cents": 10961,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-12-21",
+     "cents": 10961,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-01-04",
+     "cents": 10961,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-01-18",
+     "cents": 10961,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-02-01",
+     "cents": 10961,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-02-15",
+     "cents": 10961,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-03-01",
+     "cents": 10961,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-03-15",
+     "cents": 10961,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-03-29",
+     "cents": 10961,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-04-12",
+     "cents": 10961,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-04-26",
+     "cents": 10961,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-05-10",
+     "cents": 10961,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-05-24",
+     "cents": 10961,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-06-07",
+     "cents": 10961,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-06-21",
+     "cents": 10961,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-07-05",
+     "cents": 10961,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-07-19",
+     "cents": 10961,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-08-02",
+     "cents": 10961,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-08-16",
+     "cents": 10961,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-08-30",
+     "cents": 10961,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-09-13",
+     "cents": 10961,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-09-27",
+     "cents": 10961,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-10-11",
+     "cents": 10961,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-10-25",
+     "cents": 10961,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-11-08",
+     "cents": 10961,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-11-22",
+     "cents": 10961,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-12-06",
+     "cents": 10961,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-12-20",
+     "cents": 10961,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-01-03",
+     "cents": 10961,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-01-17",
+     "cents": 10961,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-01-31",
+     "cents": 10961,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-02-14",
+     "cents": 10961,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-02-28",
+     "cents": 10961,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-03-13",
+     "cents": 10961,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-03-27",
+     "cents": 10956,
+     "isDownPayment": false
+    }
+   ]
+  },
+  {
+   "name": "seeded case 57",
+   "balanceCents": 1468792,
+   "values": {
+    "installmentMode": "count",
+    "paymentCount": "23",
+    "installmentAmount": "",
+    "frequency": "30",
+    "frequencyCustom": "",
+    "startDate": "2027-07-23",
+    "downPayment": "",
+    "downPaymentPaid": false,
+    "downPaymentDueDate": ""
+   },
+   "payload": {
+    "installmentAmount": 638.61,
+    "frequencyDays": 30,
+    "planStartDate": "2027-07-23"
+   },
+   "rows": [
+    {
+     "date": "2027-07-23",
+     "cents": 63861,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-08-23",
+     "cents": 63861,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-09-23",
+     "cents": 63861,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-10-23",
+     "cents": 63861,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-11-23",
+     "cents": 63861,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-12-23",
+     "cents": 63861,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-01-23",
+     "cents": 63861,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-02-23",
+     "cents": 63861,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-03-23",
+     "cents": 63861,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-04-23",
+     "cents": 63861,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-05-23",
+     "cents": 63861,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-06-23",
+     "cents": 63861,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-07-23",
+     "cents": 63861,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-08-23",
+     "cents": 63861,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-09-23",
+     "cents": 63861,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-10-23",
+     "cents": 63861,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-11-23",
+     "cents": 63861,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-12-23",
+     "cents": 63861,
+     "isDownPayment": false
+    },
+    {
+     "date": "2029-01-23",
+     "cents": 63861,
+     "isDownPayment": false
+    },
+    {
+     "date": "2029-02-23",
+     "cents": 63861,
+     "isDownPayment": false
+    },
+    {
+     "date": "2029-03-23",
+     "cents": 63861,
+     "isDownPayment": false
+    },
+    {
+     "date": "2029-04-23",
+     "cents": 63861,
+     "isDownPayment": false
+    },
+    {
+     "date": "2029-05-23",
+     "cents": 63850,
+     "isDownPayment": false
+    }
+   ]
+  },
+  {
+   "name": "seeded case 58",
+   "balanceCents": 643707,
+   "values": {
+    "installmentMode": "amount",
+    "paymentCount": "",
+    "installmentAmount": "6437.07",
+    "frequency": "30",
+    "frequencyCustom": "",
+    "startDate": "2028-12-19",
+    "downPayment": "",
+    "downPaymentPaid": false,
+    "downPaymentDueDate": ""
+   },
+   "payload": {
+    "installmentAmount": 6437.07,
+    "frequencyDays": 30,
+    "planStartDate": "2028-12-19"
+   },
+   "rows": [
+    {
+     "date": "2028-12-19",
+     "cents": 643707,
+     "isDownPayment": false
+    }
+   ]
+  },
+  {
+   "name": "seeded case 59",
+   "balanceCents": 405706,
+   "values": {
+    "installmentMode": "count",
+    "paymentCount": "25",
+    "installmentAmount": "",
+    "frequency": "30",
+    "frequencyCustom": "",
+    "startDate": "2026-12-07",
+    "downPayment": "",
+    "downPaymentPaid": false,
+    "downPaymentDueDate": ""
+   },
+   "payload": {
+    "installmentAmount": 162.29,
+    "frequencyDays": 30,
+    "planStartDate": "2026-12-07"
+   },
+   "rows": [
+    {
+     "date": "2026-12-07",
+     "cents": 16229,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-01-07",
+     "cents": 16229,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-02-07",
+     "cents": 16229,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-03-07",
+     "cents": 16229,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-04-07",
+     "cents": 16229,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-05-07",
+     "cents": 16229,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-06-07",
+     "cents": 16229,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-07-07",
+     "cents": 16229,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-08-07",
+     "cents": 16229,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-09-07",
+     "cents": 16229,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-10-07",
+     "cents": 16229,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-11-07",
+     "cents": 16229,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-12-07",
+     "cents": 16229,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-01-07",
+     "cents": 16229,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-02-07",
+     "cents": 16229,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-03-07",
+     "cents": 16229,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-04-07",
+     "cents": 16229,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-05-07",
+     "cents": 16229,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-06-07",
+     "cents": 16229,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-07-07",
+     "cents": 16229,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-08-07",
+     "cents": 16229,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-09-07",
+     "cents": 16229,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-10-07",
+     "cents": 16229,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-11-07",
+     "cents": 16229,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-12-07",
+     "cents": 16210,
+     "isDownPayment": false
+    }
+   ]
+  },
+  {
+   "name": "seeded case 60",
+   "balanceCents": 180440,
+   "values": {
+    "installmentMode": "count",
+    "paymentCount": "22",
+    "installmentAmount": "",
+    "frequency": "7",
+    "frequencyCustom": "",
+    "startDate": "2027-06-02",
+    "downPayment": "",
+    "downPaymentPaid": false,
+    "downPaymentDueDate": ""
+   },
+   "payload": {
+    "installmentAmount": 82.02,
+    "frequencyDays": 7,
+    "planStartDate": "2027-06-02"
+   },
+   "rows": [
+    {
+     "date": "2027-06-02",
+     "cents": 8202,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-06-09",
+     "cents": 8202,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-06-16",
+     "cents": 8202,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-06-23",
+     "cents": 8202,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-06-30",
+     "cents": 8202,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-07-07",
+     "cents": 8202,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-07-14",
+     "cents": 8202,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-07-21",
+     "cents": 8202,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-07-28",
+     "cents": 8202,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-08-04",
+     "cents": 8202,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-08-11",
+     "cents": 8202,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-08-18",
+     "cents": 8202,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-08-25",
+     "cents": 8202,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-09-01",
+     "cents": 8202,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-09-08",
+     "cents": 8202,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-09-15",
+     "cents": 8202,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-09-22",
+     "cents": 8202,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-09-29",
+     "cents": 8202,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-10-06",
+     "cents": 8202,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-10-13",
+     "cents": 8202,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-10-20",
+     "cents": 8202,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-10-27",
+     "cents": 8198,
+     "isDownPayment": false
+    }
+   ]
+  },
+  {
+   "name": "seeded case 61",
+   "balanceCents": 1320007,
+   "values": {
+    "installmentMode": "amount",
+    "paymentCount": "",
+    "installmentAmount": "880",
+    "frequency": "30",
+    "frequencyCustom": "",
+    "startDate": "2027-05-12",
+    "downPayment": "",
+    "downPaymentPaid": false,
+    "downPaymentDueDate": ""
+   },
+   "payload": {
+    "installmentAmount": 880,
+    "frequencyDays": 30,
+    "planStartDate": "2027-05-12"
+   },
+   "rows": [
+    {
+     "date": "2027-05-12",
+     "cents": 88000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-06-12",
+     "cents": 88000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-07-12",
+     "cents": 88000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-08-12",
+     "cents": 88000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-09-12",
+     "cents": 88000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-10-12",
+     "cents": 88000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-11-12",
+     "cents": 88000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-12-12",
+     "cents": 88000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-01-12",
+     "cents": 88000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-02-12",
+     "cents": 88000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-03-12",
+     "cents": 88000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-04-12",
+     "cents": 88000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-05-12",
+     "cents": 88000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-06-12",
+     "cents": 88000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-07-12",
+     "cents": 88000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-08-12",
+     "cents": 7,
+     "isDownPayment": false
+    }
+   ]
+  },
+  {
+   "name": "seeded case 62",
+   "balanceCents": 841814,
+   "values": {
+    "installmentMode": "amount",
+    "paymentCount": "",
+    "installmentAmount": "299.64",
+    "frequency": "30",
+    "frequencyCustom": "",
+    "startDate": "2027-08-24",
+    "downPayment": "3623.91",
+    "downPaymentPaid": false,
+    "downPaymentDueDate": "2027-09-07"
+   },
+   "payload": {
+    "installmentAmount": 299.64,
+    "frequencyDays": 30,
+    "planStartDate": "2027-08-24",
+    "downPaymentAmount": 3623.91,
+    "downPaymentAlreadyPaid": false,
+    "downPaymentDueDate": "2027-09-07"
+   },
+   "rows": [
+    {
+     "date": "2027-09-07",
+     "cents": 362391,
+     "isDownPayment": true
+    },
+    {
+     "date": "2027-09-24",
+     "cents": 29964,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-10-24",
+     "cents": 29964,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-11-24",
+     "cents": 29964,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-12-24",
+     "cents": 29964,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-01-24",
+     "cents": 29964,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-02-24",
+     "cents": 29964,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-03-24",
+     "cents": 29964,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-04-24",
+     "cents": 29964,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-05-24",
+     "cents": 29964,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-06-24",
+     "cents": 29964,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-07-24",
+     "cents": 29964,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-08-24",
+     "cents": 29964,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-09-24",
+     "cents": 29964,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-10-24",
+     "cents": 29964,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-11-24",
+     "cents": 29964,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-12-24",
+     "cents": 29963,
+     "isDownPayment": false
+    }
+   ]
+  },
+  {
+   "name": "seeded case 63",
+   "balanceCents": 552347,
+   "values": {
+    "installmentMode": "count",
+    "paymentCount": "15",
+    "installmentAmount": "",
+    "frequency": "30",
+    "frequencyCustom": "",
+    "startDate": "2026-04-03",
+    "downPayment": "",
+    "downPaymentPaid": false,
+    "downPaymentDueDate": ""
+   },
+   "payload": {
+    "installmentAmount": 368.24,
+    "frequencyDays": 30,
+    "planStartDate": "2026-04-03"
+   },
+   "rows": [
+    {
+     "date": "2026-04-03",
+     "cents": 36824,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-05-03",
+     "cents": 36824,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-06-03",
+     "cents": 36824,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-07-03",
+     "cents": 36824,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-08-03",
+     "cents": 36824,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-09-03",
+     "cents": 36824,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-10-03",
+     "cents": 36824,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-11-03",
+     "cents": 36824,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-12-03",
+     "cents": 36824,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-01-03",
+     "cents": 36824,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-02-03",
+     "cents": 36824,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-03-03",
+     "cents": 36824,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-04-03",
+     "cents": 36824,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-05-03",
+     "cents": 36824,
+     "isDownPayment": false
+    },
+    {
+     "date": "2027-06-03",
+     "cents": 36811,
+     "isDownPayment": false
+    }
+   ]
+  },
+  {
+   "name": "monthly from the 31st returns to the 31st after a short month",
+   "balanceCents": 60000,
+   "values": {
+    "installmentMode": "amount",
+    "paymentCount": "",
+    "installmentAmount": "100",
+    "frequency": "30",
+    "frequencyCustom": "",
+    "startDate": "2026-01-31",
+    "downPayment": "",
+    "downPaymentPaid": false,
+    "downPaymentDueDate": ""
+   },
+   "payload": {
+    "installmentAmount": 100,
+    "frequencyDays": 30,
+    "planStartDate": "2026-01-31"
+   },
+   "rows": [
+    {
+     "date": "2026-01-31",
+     "cents": 10000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-02-28",
+     "cents": 10000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-03-31",
+     "cents": 10000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-04-30",
+     "cents": 10000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-05-31",
+     "cents": 10000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-06-30",
+     "cents": 10000,
+     "isDownPayment": false
+    }
+   ]
+  },
+  {
+   "name": "monthly from the 30th returns to the 30th after February",
+   "balanceCents": 40000,
+   "values": {
+    "installmentMode": "amount",
+    "paymentCount": "",
+    "installmentAmount": "100",
+    "frequency": "30",
+    "frequencyCustom": "",
+    "startDate": "2026-01-30",
+    "downPayment": "",
+    "downPaymentPaid": false,
+    "downPaymentDueDate": ""
+   },
+   "payload": {
+    "installmentAmount": 100,
+    "frequencyDays": 30,
+    "planStartDate": "2026-01-30"
+   },
+   "rows": [
+    {
+     "date": "2026-01-30",
+     "cents": 10000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-02-28",
+     "cents": 10000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-03-30",
+     "cents": 10000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-04-30",
+     "cents": 10000,
+     "isDownPayment": false
+    }
+   ]
+  },
+  {
+   "name": "monthly from the 31st through a leap February",
+   "balanceCents": 40000,
+   "values": {
+    "installmentMode": "amount",
+    "paymentCount": "",
+    "installmentAmount": "100",
+    "frequency": "30",
+    "frequencyCustom": "",
+    "startDate": "2028-01-31",
+    "downPayment": "",
+    "downPaymentPaid": false,
+    "downPaymentDueDate": ""
+   },
+   "payload": {
+    "installmentAmount": 100,
+    "frequencyDays": 30,
+    "planStartDate": "2028-01-31"
+   },
+   "rows": [
+    {
+     "date": "2028-01-31",
+     "cents": 10000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-02-29",
+     "cents": 10000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-03-31",
+     "cents": 10000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2028-04-30",
+     "cents": 10000,
+     "isDownPayment": false
+    }
+   ]
+  },
+  {
+   "name": "monthly from 31 March does not walk down through the 30-day months",
+   "balanceCents": 50000,
+   "values": {
+    "installmentMode": "amount",
+    "paymentCount": "",
+    "installmentAmount": "100",
+    "frequency": "30",
+    "frequencyCustom": "",
+    "startDate": "2026-03-31",
+    "downPayment": "",
+    "downPaymentPaid": false,
+    "downPaymentDueDate": ""
+   },
+   "payload": {
+    "installmentAmount": 100,
+    "frequencyDays": 30,
+    "planStartDate": "2026-03-31"
+   },
+   "rows": [
+    {
+     "date": "2026-03-31",
+     "cents": 10000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-04-30",
+     "cents": 10000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-05-31",
+     "cents": 10000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-06-30",
+     "cents": 10000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-07-31",
+     "cents": 10000,
+     "isDownPayment": false
+    }
+   ]
+  },
+  {
+   "name": "count mode from the 31st keeps the start day",
+   "balanceCents": 40000,
+   "values": {
+    "installmentMode": "count",
+    "paymentCount": "4",
+    "installmentAmount": "",
+    "frequency": "30",
+    "frequencyCustom": "",
+    "startDate": "2026-01-31",
+    "downPayment": "",
+    "downPaymentPaid": false,
+    "downPaymentDueDate": ""
+   },
+   "payload": {
+    "installmentAmount": 100,
+    "frequencyDays": 30,
+    "planStartDate": "2026-01-31"
+   },
+   "rows": [
+    {
+     "date": "2026-01-31",
+     "cents": 10000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-02-28",
+     "cents": 10000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-03-31",
+     "cents": 10000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-04-30",
+     "cents": 10000,
+     "isDownPayment": false
+    }
+   ]
+  },
+  {
+   "name": "down payment due on the 31st starts the regular rows one month on and stays on the 31st",
+   "balanceCents": 100000,
+   "values": {
+    "installmentMode": "amount",
+    "paymentCount": "",
+    "installmentAmount": "200",
+    "frequency": "30",
+    "frequencyCustom": "",
+    "startDate": "2026-01-31",
+    "downPayment": "200.00",
+    "downPaymentPaid": false,
+    "downPaymentDueDate": "2026-01-31"
+   },
+   "payload": {
+    "installmentAmount": 200,
+    "frequencyDays": 30,
+    "planStartDate": "2026-01-31",
+    "downPaymentAmount": 200,
+    "downPaymentAlreadyPaid": false,
+    "downPaymentDueDate": "2026-01-31"
+   },
+   "rows": [
+    {
+     "date": "2026-01-31",
+     "cents": 20000,
+     "isDownPayment": true
+    },
+    {
+     "date": "2026-02-28",
+     "cents": 20000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-03-31",
+     "cents": 20000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-04-30",
+     "cents": 20000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-05-31",
+     "cents": 20000,
+     "isDownPayment": false
+    }
+   ]
+  },
+  {
+   "name": "down payment collected on the 31st leaves the regular rows on the 31st",
+   "balanceCents": 100000,
+   "values": {
+    "installmentMode": "amount",
+    "paymentCount": "",
+    "installmentAmount": "200",
+    "frequency": "30",
+    "frequencyCustom": "",
+    "startDate": "2026-01-31",
+    "downPayment": "200.00",
+    "downPaymentPaid": true,
+    "downPaymentDueDate": ""
+   },
+   "payload": {
+    "installmentAmount": 200,
+    "frequencyDays": 30,
+    "planStartDate": "2026-01-31",
+    "downPaymentAmount": 200,
+    "downPaymentAlreadyPaid": true
+   },
+   "rows": [
+    {
+     "date": null,
+     "cents": 20000,
+     "isDownPayment": true
+    },
+    {
+     "date": "2026-02-28",
+     "cents": 20000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-03-31",
+     "cents": 20000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-04-30",
+     "cents": 20000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-05-31",
+     "cents": 20000,
+     "isDownPayment": false
+    }
+   ]
+  },
+  {
+   "name": "every 14 days is plain days across a month end",
+   "balanceCents": 30000,
+   "values": {
+    "installmentMode": "amount",
+    "paymentCount": "",
+    "installmentAmount": "100",
+    "frequency": "14",
+    "frequencyCustom": "",
+    "startDate": "2026-01-31",
+    "downPayment": "",
+    "downPaymentPaid": false,
+    "downPaymentDueDate": ""
+   },
+   "payload": {
+    "installmentAmount": 100,
+    "frequencyDays": 14,
+    "planStartDate": "2026-01-31"
+   },
+   "rows": [
+    {
+     "date": "2026-01-31",
+     "cents": 10000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-02-14",
+     "cents": 10000,
+     "isDownPayment": false
+    },
+    {
+     "date": "2026-02-28",
+     "cents": 10000,
+     "isDownPayment": false
+    }
+   ]
+  }
+ ]
+}

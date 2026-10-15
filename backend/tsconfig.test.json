@@ -1,0 +1,41 @@
+{
+  // Jest-only TypeScript config.
+  //
+  // The base tsconfig sets `rootDir: "src"` and excludes `tests/`, which is right
+  // for the build: dist/ should mirror src/ exactly and must not carry test code.
+  // But it makes a test file under tests/ live OUTSIDE the compilation root, and
+  // ts-jest reports that as a confusing "outDir is '' or '.'" error rather than a
+  // rootDir one.
+  //
+  // So tests compile against a widened root that spans both directories. `outDir`
+  // is nominal -- ts-jest transforms in memory and never writes it -- but it has
+  // to be a real path for the same ts-jest check.
+  // `types` is deliberately NOT narrowed. Listing it restricts which @types
+  // packages are loaded at all, which silently drops the ambient augmentations
+  // the app relies on -- pino-http's `req.id` above all -- so ts-jest rejected
+  // code that `tsc` accepts. A test config that type-checks against a different
+  // type universe than the build is worse than no test config.
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "rootDir": ".",
+    "outDir": "dist-test",
+    // Makes ts-jest transpile each file without whole-program type checking.
+    //
+    // This is not an optimisation, it is what makes an in-process spec possible
+    // at all. Requiring src/app pulls in the entire 444-file graph, and
+    // type-checking that per spec file took over four minutes before the first
+    // assertion ran. Transpile-only loads the same graph in seconds.
+    //
+    // No check is lost: `npm run typecheck` runs tsc over src/ AND tests/
+    // against this same config, so the whole program is still checked, once per
+    // run rather than once per spec.
+    "isolatedModules": true
+  },
+  // `exclude` MUST be restated. It is inherited from the base config, which
+  // excludes tests/ so dist/ never carries test code -- and an inherited exclude
+  // beats this file's include, so without this line `tsc -p tsconfig.test.json`
+  // silently checks nothing under tests/ and reports a clean run while ts-jest
+  // fails on the same files.
+  "exclude": ["node_modules", "dist", "dist-test"],
+  "include": ["src/**/*", "tests/**/*"]
+}

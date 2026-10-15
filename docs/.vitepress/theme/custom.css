@@ -1,0 +1,354 @@
+/* Slim, rounded, theme-aware scrollbars.
+   VitePress ships the browser's default scrollbars; these replace them with a
+   subtle track-less thumb that adapts to light and dark mode. */
+
+:root {
+  --pl-scrollbar-thumb: rgba(60, 60, 67, 0.24);
+  --pl-scrollbar-thumb-hover: rgba(60, 60, 67, 0.42);
+}
+
+.dark {
+  --pl-scrollbar-thumb: rgba(235, 235, 245, 0.20);
+  --pl-scrollbar-thumb-hover: rgba(235, 235, 245, 0.38);
+
+  /* Deeper, cooler dark palette in place of VitePress's default warm gray
+     (#1b1b1f). Layered so the sidebar/footer read darkest, content sits a step
+     up, and cards/code blocks lift slightly above that. */
+  --vp-c-bg: #0e1116;         /* main content background */
+  --vp-c-bg-alt: #090b0f;     /* sidebar, footer, code blocks */
+  --vp-c-bg-elv: #161a21;     /* elevated surfaces: search, dropdowns */
+  --vp-c-bg-soft: #161a21;    /* soft blocks: home feature cards, custom containers */
+
+  /* Slightly cooler dividers so edges stay visible on the darker surface. */
+  --vp-c-divider: rgba(235, 235, 245, 0.08);
+  --vp-c-gutter: #05070a;
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--pl-scrollbar-thumb) transparent;
+}
+
+/* WebKit / Chromium */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track,
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--pl-scrollbar-thumb);
+  /* transparent border + padding-box clip leaves breathing room around the
+     thumb so it reads as a slim rounded pill rather than a full-width bar. */
+  border: 2px solid transparent;
+  border-radius: 999px;
+  background-clip: padding-box;
+  transition: background-color 0.15s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--pl-scrollbar-thumb-hover);
+}
+
+/* ---------------------------------------------------------------------------
+   "Export for AI" download button
+   A solid brand button used on the Export page to download the concatenated
+   plain-text docs bundle. Styled to match VitePress's brand action buttons.
+--------------------------------------------------------------------------- */
+.docs-download-button {
+  display: inline-block;
+  margin: 8px 0 4px;
+  padding: 10px 20px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1;
+  color: var(--vp-c-white);
+  background-color: var(--vp-c-brand-1);
+  border: 1px solid var(--vp-c-brand-1);
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.docs-download-button:hover {
+  color: var(--vp-c-white);
+  background-color: var(--vp-c-brand-2);
+  border-color: var(--vp-c-brand-2);
+  text-decoration: none;
+}
+
+.docs-download-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ---------------------------------------------------------------------------
+   "Export for AI" section picker (DocsExport.vue)
+   A card with a checkbox grid of doc sections plus download / copy actions.
+--------------------------------------------------------------------------- */
+.docs-export {
+  margin: 20px 0 8px;
+  padding: 20px;
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 14px;
+  background: var(--vp-c-bg-soft);
+}
+
+.docs-export__status {
+  margin: 0;
+  color: var(--vp-c-text-2);
+}
+
+.docs-export__toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+  font-size: 13px;
+}
+
+.docs-export__link {
+  color: var(--vp-c-brand-1);
+  font-weight: 600;
+}
+
+.docs-export__link:hover {
+  text-decoration: underline;
+}
+
+.docs-export__sep {
+  color: var(--vp-c-text-3);
+}
+
+.docs-export__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.docs-export__item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 10px;
+  background: var(--vp-c-bg);
+  cursor: pointer;
+  /* Only the fade-OUT animates. The hover state snaps in instantly (see the
+     0s duration on :hover) so sweeping the cursor across items feels responsive
+     instead of leaving a trail of 150ms border fades. */
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.docs-export__item:hover {
+  border-color: var(--vp-c-brand-1);
+  background: var(--vp-c-default-soft);
+  transition-duration: 0s;
+}
+
+.docs-export__item input {
+  accent-color: var(--vp-c-brand-1);
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+.docs-export__item-title {
+  flex: 1;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--vp-c-text-1);
+}
+
+.docs-export__item-count {
+  min-width: 22px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  text-align: center;
+  color: var(--vp-c-text-2);
+  background: var(--vp-c-default-soft);
+}
+
+.docs-export__actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.docs-export__meta {
+  font-size: 13px;
+  color: var(--vp-c-text-2);
+}
+
+/* ---------------------------------------------------------------------------
+   Local search modal
+   VitePress ships a functional but plain search dialog. The rules below refine
+   the shell, input, result rows, keyboard hints, and match highlighting so the
+   modal reads as a polished, rounded surface consistent with the rest of docs.
+
+   Two things to know about how these win the cascade:
+   - VitePress's own component styles are scoped with a [data-v-*] attribute,
+     which ties or beats a plain two-class selector and loads later, so it would
+     otherwise win. Structural rules below therefore double the root class
+     (.VPLocalSearchBox.VPLocalSearchBox) to add a class of specificity. The
+     doubled selector is intentional, not a typo.
+   - The match highlight is driven by VitePress's own CSS variables, so we set
+     those directly rather than fight the scoped `mark` selector.
+--------------------------------------------------------------------------- */
+
+/* Replace the harsh solid-blue highlight (bright bg + black text) with a soft
+   brand chip. These variables are consumed by VitePress's own `mark` rule, so
+   overriding them here restyles every match with no specificity battle. Both
+   values reference theme-aware brand tokens, so they adapt to light/dark. */
+:root {
+  --vp-local-search-highlight-bg: var(--vp-c-brand-soft);
+  --vp-local-search-highlight-text: var(--vp-c-brand-1);
+}
+
+/* Dim + blur the page behind the dialog so the modal stands forward. */
+.VPLocalSearchBox.VPLocalSearchBox .backdrop {
+  background: rgba(15, 18, 22, 0.5);
+  backdrop-filter: blur(4px);
+}
+
+/* The dialog itself: softer radius, a real shadow, breathing room. */
+.VPLocalSearchBox.VPLocalSearchBox .shell {
+  border-radius: 14px;
+  border: 1px solid var(--vp-c-divider);
+  box-shadow: 0 18px 50px -12px rgba(0, 0, 0, 0.4), 0 6px 16px -8px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+}
+
+/* Search bar: lose the flat divider, let the input breathe. */
+.VPLocalSearchBox.VPLocalSearchBox .search-bar {
+  padding: 6px 6px 6px 14px;
+}
+
+.VPLocalSearchBox.VPLocalSearchBox .search-input {
+  font-size: 16px;
+  padding: 10px 0;
+}
+
+.VPLocalSearchBox.VPLocalSearchBox .search-actions {
+  gap: 4px;
+}
+
+.VPLocalSearchBox.VPLocalSearchBox .search-actions button {
+  border-radius: 8px;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.VPLocalSearchBox.VPLocalSearchBox .search-actions button:hover {
+  background: var(--vp-c-default-soft);
+  color: var(--vp-c-text-1);
+}
+
+/* Results list: consistent gutter and comfortable row rhythm. */
+.VPLocalSearchBox.VPLocalSearchBox .results {
+  padding: 6px 8px 8px;
+}
+
+/* Each result is a rounded card with a subtle idle border. Kill VitePress's
+   default full-width divider between rows. */
+.VPLocalSearchBox.VPLocalSearchBox .result {
+  margin: 0 0 4px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.VPLocalSearchBox.VPLocalSearchBox .result > div {
+  padding: 10px 12px;
+  margin: 0;
+}
+
+/* Active / hovered row: brand-tinted fill and border instead of the harsh
+   solid blue outline VitePress uses by default. */
+.VPLocalSearchBox.VPLocalSearchBox .result.selected {
+  border-color: var(--vp-c-brand-1);
+  background: var(--vp-c-brand-soft);
+}
+
+.VPLocalSearchBox.VPLocalSearchBox .result.selected .title {
+  color: var(--vp-c-text-1);
+}
+
+/* Breadcrumb "parent > child" titles: mute the parents, keep the leaf clear. */
+.VPLocalSearchBox.VPLocalSearchBox .titles .title .text {
+  color: var(--vp-c-text-2);
+  font-weight: 500;
+}
+
+.VPLocalSearchBox.VPLocalSearchBox .titles .title:last-child .text {
+  color: var(--vp-c-text-1);
+  font-weight: 600;
+}
+
+.VPLocalSearchBox.VPLocalSearchBox .title-icon {
+  opacity: 0.7;
+}
+
+/* Hide the footer keyboard hints ("to navigate / to select / to close"). */
+.VPLocalSearchBox.VPLocalSearchBox .search-keyboard-shortcuts {
+  display: none;
+}
+
+/* Hide the backspace-style "Close search" button; the clear (X) button covers
+   clearing the query, and Esc / a backdrop click still closes the modal. */
+.VPLocalSearchBox.VPLocalSearchBox .back-button {
+  display: none;
+}
+
+/* ---------------------------------------------------------------------------
+   Algolia DocSearch modal
+   When ALGOLIA_* env vars are set the site serves Algolia DocSearch instead of
+   the local search above. DocSearch is themed entirely through its own
+   --docsearch-* CSS variables (VitePress maps some to its palette already); the
+   overrides below pin the accents to our brand and give the active result the
+   same soft-tint treatment as the local modal rather than DocSearch's default
+   solid-blue row. These selectors only match DocSearch markup, so they coexist
+   harmlessly with the local-search rules above.
+--------------------------------------------------------------------------- */
+:root {
+  --docsearch-primary-color: var(--vp-c-brand-1);
+  --docsearch-highlight-color: var(--vp-c-brand-1);
+  --docsearch-hit-active-color: var(--vp-c-text-1);
+  --docsearch-modal-shadow: 0 18px 50px -12px rgba(0, 0, 0, 0.4),
+    0 6px 16px -8px rgba(0, 0, 0, 0.3);
+}
+
+.dark {
+  --docsearch-modal-background: var(--vp-c-bg-elv);
+  --docsearch-searchbox-background: var(--vp-c-bg);
+  --docsearch-searchbox-focus-background: var(--vp-c-bg);
+  --docsearch-hit-background: var(--vp-c-bg-soft);
+  --docsearch-footer-background: var(--vp-c-bg-elv);
+}
+
+/* Softer modal corners to match the rest of the docs surfaces. */
+.DocSearch-Modal {
+  border-radius: 14px;
+}
+
+/* Match highlight: soft brand chip instead of a bold underline/solid fill. */
+.DocSearch-Hit mark,
+.DocSearch-Hit[aria-selected='true'] mark {
+  color: var(--vp-c-brand-1) !important;
+  background: var(--vp-c-brand-soft);
+  border-radius: 4px;
+  padding: 0 2px;
+}
+
+/* Active result: soft brand fill + normal text, not DocSearch's solid blue. */
+.DocSearch-Hit[aria-selected='true'] a {
+  background: var(--vp-c-brand-soft);
+}
