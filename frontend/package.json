@@ -57,7 +57,7 @@
     "firebase": "^12.14.0",
     "framer-motion": "^12.23.12",
     "heic2any": "^0.0.4",
-    "isomorphic-dompurify": "^3.18.0",
+    "isomorphic-dompurify": "^4.5.0",
     "lucide-react": "^1.17.0",
     "next": "^16.2.7",
     "pdf-lib": "^1.17.1",
