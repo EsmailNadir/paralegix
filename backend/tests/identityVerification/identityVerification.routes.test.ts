@@ -525,6 +525,41 @@ describe('poll (W3C flow)', () => {
     expect(JSON.stringify(done.body)).not.toContain(FAKE_LICENSE_NUMBER);
   });
 
+  it('reports the issuing authority claim, never the signer DID, as the issuer', async () => {
+    const w = await world('Jose Nunez Diaz');
+    const id = await startW3c(w);
+    mockCredence.pollW3c.mockResolvedValueOnce({
+      success: true,
+      claims: { given_name: 'Jose', family_name: 'Nunez Diaz', issuing_authority: 'CA' },
+      issuer: 'did:jwk:eyJjcnYiOiJQLTI1NiIsImt0eSI6IkVDIn0',
+      issuanceDate: null, expirationDate: null, credentialType: null,
+      verificationDetails: allChecks,
+      error: null,
+    });
+
+    const res = await w.alice.api.post(verificationsPath(w.home.id, `/${id}/poll`));
+
+    expect(res.body.result).toMatchObject({ status: 'verified', issuer: 'CA' });
+    expect((await rowOf(id)).issuer).toBe('CA');
+  });
+
+  it('leaves the issuer empty when the only issuer on the credential is a DID', async () => {
+    const w = await world('Jose Nunez Diaz');
+    const id = await startW3c(w);
+    mockCredence.pollW3c.mockResolvedValueOnce({
+      success: true,
+      claims: { given_name: 'Jose', family_name: 'Nunez Diaz' },
+      issuer: 'did:jwk:eyJjcnYiOiJQLTI1NiIsImt0eSI6IkVDIn0',
+      issuanceDate: null, expirationDate: null, credentialType: null,
+      verificationDetails: allChecks,
+      error: null,
+    });
+
+    const res = await w.alice.api.post(verificationsPath(w.home.id, `/${id}/poll`));
+
+    expect(res.body.result).toMatchObject({ status: 'verified', issuer: null });
+  });
+
   it('success with any failed check is failed', async () => {
     const w = await world();
     const id = await startW3c(w);

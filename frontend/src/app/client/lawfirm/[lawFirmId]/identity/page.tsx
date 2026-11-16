@@ -246,15 +246,22 @@ function FlowBody({ state, latest, supportsWallet, onPrefetch, onVerifyWithWalle
               : "Scan a QR code with your phone to share your ID from your wallet app."}
           </p>
           {supportsWallet ? (
-            <Button
-              type="primary"
-              icon={<Wallet size={16} />}
-              loading={state.kind === "starting"}
-              onPointerDown={onPrefetch}
-              onClick={onVerifyWithWallet}
-            >
-              Verify with my phone&apos;s wallet
-            </Button>
+            // The second option covers an ID held in a separate wallet app
+            // (a state DMV wallet, for example) rather than the phone's own wallet.
+            <div className="flex flex-wrap gap-2">
+              <Button
+                type="primary"
+                icon={<Wallet size={16} />}
+                loading={state.kind === "starting"}
+                onPointerDown={onPrefetch}
+                onClick={onVerifyWithWallet}
+              >
+                Verify with my phone&apos;s wallet
+              </Button>
+              <Button type="secondary" icon={<QrCode size={16} />} disabled={state.kind === "starting"} onClick={onShowQrCode}>
+                Use a wallet app instead
+              </Button>
+            </div>
           ) : (
             <Button type="primary" icon={<QrCode size={16} />} loading={state.kind === "starting"} onClick={onShowQrCode}>
               Show QR code

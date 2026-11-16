@@ -183,6 +183,18 @@ function interpretDcAnswer(answer: DcVerifyResponse, recordName: unknown): Verif
  * Flow D: the W3C OpenID4VP answer. Success requires the provider's own flag
  * AND every boolean in `verificationDetails`; those booleans are the checks.
  */
+/**
+ * The jurisdiction that issued a W3C credential. A state wallet's `issuer` is
+ * the signer's DID (`did:jwk:...`), which means nothing to a person, so the
+ * issuing authority claim wins and a DID is never reported.
+ */
+function w3cIssuer(claims: Record<string, unknown>, issuer: unknown): string | null {
+  const named = cleanText(claims.issuing_authority) ?? cleanText(claims.issuing_jurisdiction) ?? cleanText(claims.issuing_country);
+  if (named) return named;
+  const fallback = cleanText(issuer);
+  return fallback && !fallback.startsWith('did:') ? fallback : null;
+}
+
 function interpretW3cAnswer(answer: W3cResultResponse, recordName: unknown): VerificationOutcome {
   const checks: Record<string, boolean> = {};
   for (const [key, value] of Object.entries(answer?.verificationDetails ?? {})) {
@@ -206,7 +218,7 @@ function interpretW3cAnswer(answer: W3cResultResponse, recordName: unknown): Ver
     status: 'verified',
     verifiedGivenName: given,
     verifiedFamilyName: family,
-    issuer: cleanText(answer.issuer),
+    issuer: w3cIssuer(claims, answer.issuer),
     docType: cleanText(types[types.length - 1]),
     credentialExpiresOn: dayOnly(answer.expirationDate),
     isNameMatch: nameMatches(given, family, recordName),

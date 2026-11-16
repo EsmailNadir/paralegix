@@ -102,6 +102,22 @@ it('offers the wallet button with the intro copy when the browser has the Digita
   expect(screen.getByRole('heading', { level: 1, name: 'Verify your identity' })).toBeInTheDocument();
   expect(screen.getByText(INTRO)).toBeInTheDocument();
   expect(screen.queryByRole('button', { name: 'Show QR code' })).not.toBeInTheDocument();
+  expect(screen.getByRole('button', { name: 'Use a wallet app instead' })).toBeInTheDocument();
+  expect((await scanAccessibility(container)).violations).toEqual([]);
+});
+
+it('lets a phone whose wallet can open still choose a wallet app over the QR flow', async () => {
+  installWallet();
+  api.getExact(STATUS, { configured: true, latest: null });
+  api.postExact(START, { status: 201, body: { verificationId: 'ver-9', method: 'w3c_openid4vp', request: { walletUrl: 'openid4vp://authorize?client_id=a&request_uri=b' } } });
+  api.postExact('/api/client-portal/lawfirm/firm-a/identity/verifications/ver-9/poll?clientRecordId=rec-a', { status: 202, body: {} });
+  const { container } = renderWithProviders(<IdentityPage />);
+
+  await userEvent.click(await screen.findByRole('button', { name: 'Use a wallet app instead' }));
+
+  expect(await screen.findByRole('link', { name: 'Open wallet app' })).toHaveAttribute('href', 'openid4vp://authorize?client_id=a&request_uri=b');
+  expect(api.callsTo('/verifications')[0].body).toEqual({ method: 'w3c_openid4vp' });
+  expect(credentialsGet).not.toHaveBeenCalled();
   expect((await scanAccessibility(container)).violations).toEqual([]);
 });
 
